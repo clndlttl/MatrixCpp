@@ -9,6 +9,7 @@
 #define MATRIX_H
 
 #include <vector>
+#include <iostream>
 
 using namespace std;
 
@@ -23,9 +24,8 @@ class Row
 {
   public:
 	// construct from vector
-    Row(vector<T>& v);
+    Row<T>(const vector<T>& v);
     
-  private:	
     vector<T> data;
 };
 
@@ -40,9 +40,8 @@ class Column
 {
   public:
 	// construct from vector
-    Column(vector<T>& vin);
+    Column<T>(const vector<T>& vin);
     
-  private:	
     vector<T> data;
 };
 
@@ -52,11 +51,13 @@ class Column
  * 
  */
 
-template<class T>
-class Matrix2D : public Column
+template <class T>
+class Matrix2D
 {
 	public:
-		Matrix2D( int nRows, int nCols, vector<T>& vals );
+		Matrix2D<T>( int nRows, int nCols, const vector<T>& vals );
+		void show();
+
 
 	private: 
 		int nr;
@@ -65,9 +66,54 @@ class Matrix2D : public Column
 };
 
 
+template <class T>
+Row<T>::Row( const vector<T>& v )
+{
+	for(auto i : v)
+	{
+		data.push_back(i);
+	}
+}
 
+template <class T>
+Column<T>::Column( const vector<T>& v )
+{
+	for(auto i : v)
+	{
+		data.push_back(i);
+	}
+}
 
+template <class T>
+Matrix2D<T>::Matrix2D( int nRows, int nCols, const vector<T>& v )
+{
+	nr = nRows;
+	nc = nCols;
 
+	auto p = v.begin();
+
+	for(int r = 0; r < nRows; r++)
+	{
+		vector<T> newRowVec (p,p+nCols);
+		data.push_back( newRowVec );
+
+		// incr p
+		p += nCols;
+	}
+}
+
+template <class T>
+void Matrix2D<T>::show()
+{
+	for(int r=0; r<nr; r++)
+	{
+		for(int c=0; c<nc; c++)
+		{
+			cout << ' ' << data[r].data[c];
+		}
+		cout << endl;
+	}
+}
 
 
 #endif
