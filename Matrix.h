@@ -11,8 +11,6 @@
 #include <vector>
 #include <iostream>
 
-#include "Code.h"
-
 using namespace std;
 
 template <class T> class Column;
@@ -47,13 +45,16 @@ class Row
     T operator*(Column<T>& c);
 
 	// row by mat
-	Row<T> operator*(const Matrix2D<T>& m);
+	Row<T> operator*(Matrix2D<T>& m);
 
 	// at[]
 	T operator[](int idx){ return data[idx]; }
 
 	// checkDimensions
 	void checkDimensions( int N );
+
+	// get size of data
+	int getDataSize(){ return data.size(); }
 
   private:
 	// the actual data
@@ -84,14 +85,19 @@ class Column
 	Column<T> operator*(const T s);
 
 	// col by row
-	Matrix2D<T> operator*(const Row<T>& r);
+	Matrix2D<T> operator*( Row<T>& r);
 
 	// at[]
 	T operator[](int idx){ return data[idx]; }
 
+	// get size of data
+	int getDataSize(){ return data.size(); }
+  
   private:	
 	vector<T> data;
 };
+
+
 
 /* Matrix2D
  *
@@ -106,25 +112,29 @@ class Matrix2D
 	Matrix2D<T>(){ nr = nc = 0; }
 
 	// construct from std::vector
-	Matrix2D<T>( int nRows, int nCols, const vector<T>& vals );
+	Matrix2D<T>( int nRows, int nCols, vector<T>& vals );
 		
 	// show matrix
 	void show();
 	
 	// add element
 	void add(Row<T>& r){ matrix.push_back(r);
-					  	 nr++; }	 
+					  	 nr++;
+						 nc = r.getDataSize(); }	 
 	// mat by col
-	Column<T> operator*(const Column<T>& c);
+	Column<T> operator*(Column<T>& c);
 	
 	// mat by mat
-	Matrix2D<T> operator*(const Matrix2D<T>& m_rhs);
+	Matrix2D<T> operator*(Matrix2D<T>& m_rhs);
 	
 	// mat by scalar
-	Matrix2D<T> operator*(const T& s);
+	Matrix2D<T> operator*(const T s);
 	
 	// at[]
 	Row<T> operator[](int idx){ return matrix[idx]; }
+
+	// checkDimensions
+	void checkDimensions( int N );
 
 	int nr;
 	int nc;
@@ -157,16 +167,18 @@ Column<T>::Column( const vector<T>& v )
 }
 
 
-
 template <class T>
-Matrix2D<T>::Matrix2D( int nRows, int nCols, const vector<T>& v )
+Matrix2D<T>::Matrix2D( int nRows, int nCols, vector<T>& v )
 {
 	auto ptr = v.begin();
+
+	nr = nRows; nc = nCols;
 
 	for(int r = 0; r < nRows; r++)
 	{
 		vector<T> newRowVec (ptr, ptr+nCols);
-		add( newRowVec );
+		Row<T> newRowObj(newRowVec);
+		matrix.push_back( newRowObj );
 		ptr += nCols;
 	}
 }
@@ -193,7 +205,7 @@ void Column<T>::show()
 {
 	for(auto i : data)
 	{
-		cout << ' ' << i;
+		cout << ' ' << i << endl;
 	}
 	cout << endl;
 }
@@ -235,10 +247,10 @@ Row<T> Row<T>::operator*(const T s)
 template <class T>
 T Row<T>::operator*(Column<T>& c)
 {
-	checkDimensions( c.data.size() );
+	checkDimensions( c.getDataSize() );
 
 	T s = static_cast<T>(0);
-	for(int i=0; i < c.data.size(); i++)
+	for(int i=0; i < c.getDataSize(); i++)
 	{
 		s += data[i] * c[i];
 	}
@@ -248,7 +260,7 @@ T Row<T>::operator*(Column<T>& c)
 
 // row by mat
 template <class T>
-Row<T> Row<T>::operator*(const Matrix2D<T>& m)
+Row<T> Row<T>::operator*(Matrix2D<T>& m)
 {
 
 	checkDimensions( m.nr );
@@ -256,11 +268,12 @@ Row<T> Row<T>::operator*(const Matrix2D<T>& m)
 	Row<T> rv;
 	for(int i=0; i < m.nc; i++)
 	{
-		rv.add( static_cast<T>(0) );
+		T accum = static_cast<T>(0);
 		for(int j=0; j < m.nr; j++)
 		{
-			rv[i] += data[j] * m[j][i];
+			accum += data[j] * m[j][i];
 		}
+		rv.add( accum );
 	}
 	return rv;
 }
@@ -281,13 +294,14 @@ Column<T> Column<T>::operator*(const T s)
 
 // col by row
 template <class T>
-Matrix2D<T> Column<T>::operator*(const Row<T>& r)
+Matrix2D<T> Column<T>::operator*(Row<T>& r)
 {
 	Matrix2D<T> m;
+
 	for(int i=0; i < data.size(); i++)
 	{
 		Row<T> newr;
-		for(int j=0; j < r.data.size(); j++)
+		for(int j=0; j < r.getDataSize(); j++)
 		{
 			newr.add( data[i] * r[j] );
 		}
@@ -300,15 +314,61 @@ Matrix2D<T> Column<T>::operator*(const Row<T>& r)
 
 // mat by col
 template <class T>
-Column<T> Matrix2D<T>::operator*(const Column<T>& c){}
+Column<T> Matrix2D<T>::operator*(Column<T>& c)
+{
+	checkDimensions( c.getDataSize() );
+
+	Column<T> cv;
+	for(int i=0; i < nr; i++)
+	{
+		T accum = static_cast<T>(0);
+		for(int j=0; j < c.getDataSize(); j++)
+		{
+			accum += matrix[i][j] * c[j];
+		}
+		cv.add( accum );
+	}
+	return cv;
+}
 	
 // mat by mat
 template <class T>
-Matrix2D<T> Matrix2D<T>::operator*(const Matrix2D<T>& m_rhs){}
+Matrix2D<T> Matrix2D<T>::operator*(Matrix2D<T>& m_rhs)
+{
+	checkDimensions( m_rhs.nr );
+
+	Matrix2D<T> mv;
+
+	for(int i=0; i < nr; i++)
+	{
+		Row<T> newr;
+		for(int j=0; j < m_rhs.nc; j++)
+		{
+			T accum = static_cast<T>(0);
+			for(int k=0; k < nc; k++)
+			{
+				accum += matrix[i][k] * m_rhs[k][j];
+			}
+			newr.add( accum );	 	
+		}
+		mv.add( newr );
+	}
+	return mv;
+}
 	
 // mat by scalar
 template <class T>
-Matrix2D<T> Matrix2D<T>::operator*(const T& s){}
+Matrix2D<T> Matrix2D<T>::operator*(const T s)
+{
+	Matrix2D<T> mv;
+
+	for(int i=0; i < nr; i++)
+	{
+		Row<T> newr = matrix[i] * s;
+		mv.add( newr );
+	}
+	return mv;
+}
 
 
 
@@ -326,6 +386,15 @@ void Row<T>::checkDimensions( int N )
 	}
 }
 
+template <class T>
+void Matrix2D<T>::checkDimensions( int N )
+{
+	if ( N != nc )
+	{
+		cout << "Dimension Error: Matrix cols "
+			 << nc << " != " << N << endl;
+	}
+}
 
 
 
