@@ -40,6 +40,8 @@ class Row
 
 	// row by scalar
 	Row<T> operator*(const T s);
+	template <class G> friend Row<G> operator*(const G s, Row<G>& me);
+
 
 	// row by col
     T operator*(Column<T>& c);
@@ -81,7 +83,8 @@ class Column
 
 	// col by scalar
 	Column<T> operator*(const T s);
-
+	template <class G> friend Column<G> operator*(const G s, Column<G>& me);
+	
 	// col by row
 	Matrix2D<T> operator*( Row<T>& r);
 
@@ -140,6 +143,7 @@ class Matrix2D
 	
 	// mat by scalar
 	Matrix2D<T> operator*(const T s);
+	template <class G> friend Matrix2D<G> operator*(const G s, Matrix2D<G>& me);
 	
 	// at[]
 	vector<T>& operator[](int idx){ return matrix[idx]; }
@@ -155,13 +159,16 @@ class Matrix2D
  	 */
 
 template <class T>
-Matrix2D<T>::Matrix2D( int nRows, int nCols )
+Matrix2D<T>::Matrix2D( int rows, int cols )
 {
-	matrix.resize(nRows);
+	numRows = rows;
+	numCols = cols;
+	
+	matrix.resize(numRows);
 
-	for(int r=0; r < nRows; r++)
+	for(int r=0; r < numRows; r++)
 	{
-		matrix[r].resize(nCols);
+		matrix[r].resize(numCols);
 	}
 }
 
@@ -242,6 +249,12 @@ Row<T> Row<T>::operator*(const T s)
 	return row_rv;
 }
 
+template <class G>
+Row<G> operator*(const G s, Row<G>& me)
+{
+	return me * s;
+}
+
 
 // row by col
 template <class T>
@@ -294,6 +307,13 @@ Column<T> Column<T>::operator*(const T s)
 	}
 	return col_rv;
 }
+
+template <class G>
+Column<G> operator*(const G s, Column<G>& me)
+{
+	return me * s;
+}
+
 
 
 // col by row
@@ -383,6 +403,12 @@ Matrix2D<T> Matrix2D<T>::operator*(const T s)
 		M.add( newRow );
 	}
 	return M;
+}
+
+template <class G>
+Matrix2D<G> operator*(const G s, Matrix2D<G>& me)
+{
+	return me * s;
 }
 
 

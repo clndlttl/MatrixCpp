@@ -10,8 +10,9 @@ int main()
 
 	Row<int> r(row);
 	Column<int> c(col);
-	Matrix2D<int> M(3,3,mat);
+	Matrix2D<int> M(3,3);
 
-	Matrix2D<int> res = c*r*M;
-	res.show();
+	Column<double> dr(5);
+
+	dr.show();
 }
