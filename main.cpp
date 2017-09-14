@@ -4,15 +4,17 @@
 int main()
 {
 
-	vector<int> row = {1,2,3};
-	vector<int> col = {4,5,6};
-	vector<int> mat = {1,0,0,0,1,0,0,0,1};
+	vector<int> row = {1,2,-3};
+	vector<int> col = {4,-5,6};
+	vector<int> mat = { 1,0,0,
+					    0,1,0,
+					    0,0,1 };
 
 	Row<int> r(row);
 	Column<int> c(col);
-	Matrix2D<int> M(3,3);
+	Matrix2D<int> M(3,3,mat);
 
-	Column<double> dr(5);
-
-	dr.show();
+	Matrix2D<int> res = 3*M - c*r ; 
+	
+	res.show();
 }

@@ -38,16 +38,17 @@ class Row
 	// add element
 	void add(T val){ data.push_back(val); }
 
-	// row by scalar
+	// multiplication
 	Row<T> operator*(const T s);
-	template <class G> friend Row<G> operator*(const G s, Row<G>& me);
+	template <class G> friend Row<G> operator*(const G s, Row<G> me);
+    T operator*(Column<T> c);
+	Row<T> operator*(Matrix2D<T> m);
 
+	// addition
+	Row<T> operator+(Row<T> r);	
 
-	// row by col
-    T operator*(Column<T>& c);
-
-	// row by mat
-	Row<T> operator*(Matrix2D<T>& m);
+	// subtraction
+	Row<T> operator-(Row<T> r);	
 
 	// at[]
 	T& operator[](int idx){ return data[idx]; }
@@ -81,12 +82,16 @@ class Column
 	// add element
 	void add(T val){ data.push_back(val); }
 
-	// col by scalar
+	// multiplication
 	Column<T> operator*(const T s);
-	template <class G> friend Column<G> operator*(const G s, Column<G>& me);
-	
-	// col by row
-	Matrix2D<T> operator*( Row<T>& r);
+	template <class G> friend Column<G> operator*(const G s, Column<G> me);
+	Matrix2D<T> operator*( Row<T> r);
+
+	// addition
+	Column<T> operator+(Column<T> c);
+
+	// subtraction
+	Column<T> operator-(Column<T> c);	
 
 	// at[]
 	T& operator[](int idx){ return data[idx]; }
@@ -94,6 +99,9 @@ class Column
 	// get size of data
 	int getDataSize(){ return data.size(); }
   
+	// checkDimensions
+	void checkDimensions( int N, const char* file, int line );
+
 };
 
 
@@ -135,21 +143,24 @@ class Matrix2D
 	int getNumRows(){ return numRows; }
 	int getNumCols(){ return numCols; }
 
-	// mat by col
-	Column<T> operator*(Column<T>& c);
-	
-	// mat by mat
-	Matrix2D<T> operator*(Matrix2D<T>& m_rhs);
-	
-	// mat by scalar
+	// multiplication
+	Column<T> operator*(Column<T> c);
+	Matrix2D<T> operator*(Matrix2D<T> m_rhs);
 	Matrix2D<T> operator*(const T s);
-	template <class G> friend Matrix2D<G> operator*(const G s, Matrix2D<G>& me);
+	template <class G> friend Matrix2D<G> operator*(const G s, Matrix2D<G> me);
 	
+	// addition
+	Matrix2D<T> operator+(Matrix2D<T> m);
+	
+	// subtraction
+	Matrix2D<T> operator-(Matrix2D<T> m);	
+
 	// at[]
 	vector<T>& operator[](int idx){ return matrix[idx]; }
 
 	// checkDimensions
 	void checkDimensions( int N, const char* file, int line );
+	void checkDimensionsAddSub( int NR, int NC, const char* file, int line );
 
 };
 
@@ -250,7 +261,7 @@ Row<T> Row<T>::operator*(const T s)
 }
 
 template <class G>
-Row<G> operator*(const G s, Row<G>& me)
+Row<G> operator*(const G s, Row<G> me)
 {
 	return me * s;
 }
@@ -258,7 +269,7 @@ Row<G> operator*(const G s, Row<G>& me)
 
 // row by col
 template <class T>
-T Row<T>::operator*(Column<T>& c)
+T Row<T>::operator*(Column<T> c)
 {
 	checkDimensions( c.getDataSize(), __FILE__, __LINE__ );
 
@@ -273,7 +284,7 @@ T Row<T>::operator*(Column<T>& c)
 
 // row by mat
 template <class T>
-Row<T> Row<T>::operator*(Matrix2D<T>& m)
+Row<T> Row<T>::operator*(Matrix2D<T> m)
 {
 	int mat_numRows = m.getNumRows();
 	int mat_numCols = m.getNumCols();
@@ -309,7 +320,7 @@ Column<T> Column<T>::operator*(const T s)
 }
 
 template <class G>
-Column<G> operator*(const G s, Column<G>& me)
+Column<G> operator*(const G s, Column<G> me)
 {
 	return me * s;
 }
@@ -318,7 +329,7 @@ Column<G> operator*(const G s, Column<G>& me)
 
 // col by row
 template <class T>
-Matrix2D<T> Column<T>::operator*(Row<T>& r)
+Matrix2D<T> Column<T>::operator*(Row<T> r)
 {
 	Matrix2D<T> M;
 	int n = r.getDataSize();
@@ -338,7 +349,7 @@ Matrix2D<T> Column<T>::operator*(Row<T>& r)
 
 // mat by col
 template <class T>
-Column<T> Matrix2D<T>::operator*(Column<T>& c)
+Column<T> Matrix2D<T>::operator*(Column<T> c)
 {
 	int size = c.getDataSize();
 	checkDimensions( size, __FILE__, __LINE__ );
@@ -360,7 +371,7 @@ Column<T> Matrix2D<T>::operator*(Column<T>& c)
 	
 // mat by mat
 template <class T>
-Matrix2D<T> Matrix2D<T>::operator*(Matrix2D<T>& m_rhs)
+Matrix2D<T> Matrix2D<T>::operator*(Matrix2D<T> m_rhs)
 {
 	int rhs_numRows = m_rhs.getNumRows();
 	int rhs_numCols = m_rhs.getNumCols();
@@ -406,11 +417,118 @@ Matrix2D<T> Matrix2D<T>::operator*(const T s)
 }
 
 template <class G>
-Matrix2D<G> operator*(const G s, Matrix2D<G>& me)
+Matrix2D<G> operator*(const G s, Matrix2D<G> me)
 {
 	return me * s;
 }
 
+
+	/* Addition
+	 *
+	 */
+
+template <class T>
+Row<T> Row<T>::operator+( Row<T> r )
+{
+	checkDimensions( r.getDataSize(), __FILE__, __LINE__ );
+	
+	int size = data.size();
+	Row<T> row_rv( size );
+
+	for(int i=0; i < size; i++)
+	{
+		row_rv[i] = data[i]+r[i];		
+	}
+	return row_rv;
+}
+
+template <class T>
+Column<T> Column<T>::operator+( Column<T> c )
+{
+	checkDimensions( c.getDataSize(), __FILE__, __LINE__ );
+	
+	int size = data.size();
+	Column<T> col_rv( size );
+
+	for(int i=0; i < size; i++)
+	{
+		col_rv[i] = data[i]+c[i];		
+	}
+	return col_rv;
+}
+
+template <class T>
+Matrix2D<T> Matrix2D<T>::operator+( Matrix2D<T> m )
+{
+	checkDimensionsAddSub( m.getNumRows(), m.getNumCols(), __FILE__, __LINE__ );
+
+	Matrix2D<T> M_rv;
+
+	for(int i=0; i < numRows; i++)
+	{
+		vector<T> newRow( numCols );
+ 		for(int j=0; j < numCols; j++)
+		{
+			newRow[j] = matrix[i][j] + m[i][j];
+		}
+		M_rv.add( newRow );
+	}
+	return M_rv;
+}
+
+
+	/* Subtraction
+	 *
+	 */
+
+template <class T>
+Row<T> Row<T>::operator-( Row<T> r )
+{
+	checkDimensions( r.getDataSize(), __FILE__, __LINE__ );
+	
+	int size = data.size();
+	Row<T> row_rv( size );
+
+	for(int i=0; i < size; i++)
+	{
+		row_rv[i] = data[i]-r[i];		
+	}
+	return row_rv;
+}
+
+template <class T>
+Column<T> Column<T>::operator-( Column<T> c )
+{
+	checkDimensions( c.getDataSize(), __FILE__, __LINE__ );
+	
+	int size = data.size();
+	Column<T> col_rv( size );
+
+	for(int i=0; i < size; i++)
+	{
+		col_rv[i] = data[i]-c[i];		
+	}
+	return col_rv;
+}
+
+template <class T>
+Matrix2D<T> Matrix2D<T>::operator-( Matrix2D<T> m )
+{
+	checkDimensionsAddSub( m.getNumRows(), m.getNumCols(), __FILE__, __LINE__ );
+
+	Matrix2D<T> M_rv;
+
+	for(int i=0; i < numRows; i++)
+	{
+		vector<T> newRow( numCols );
+ 		for(int j=0; j < numCols; j++)
+		{
+			newRow[j] = matrix[i][j] - m[i][j];
+		}
+		M_rv.add( newRow );
+	}
+	return M_rv;
+}
 
 
 	/* Error Detection
@@ -429,12 +547,41 @@ void Row<T>::checkDimensions( int N, const char* file, int line )
 }
 
 template <class T>
+void Column<T>::checkDimensions( int N, const char* file, int line )
+{
+	if ( N != data.size() )
+	{
+		cout << "Dimension mismatch! "
+			 << data.size() << " != " << N << endl
+			 << '\t' << file << ':' << line << endl;
+	}
+}
+
+template <class T>
 void Matrix2D<T>::checkDimensions( int N, const char* file, int line )
 {
 	if ( (numRows > 0) && (N != numCols) )
 	{
 		cout << "Dimension mismatch! "
 			 << numCols << " != " << N << endl
+			 << '\t' << file << ':' << line << endl;
+	}
+}
+
+template <class T>
+void Matrix2D<T>::checkDimensionsAddSub( int NR, int NC, const char* file, int line )
+{
+	if ( (numRows > 0) && (NR != numRows) )
+	{
+		cout << "Dimension mismatch! "
+			 << numRows << " != " << NR << endl
+			 << '\t' << file << ':' << line << endl;
+	}
+
+	if ( (numRows > 0) && (NC != numCols) )
+	{
+		cout << "Dimension mismatch! "
+			 << numCols << " != " << NC << endl
 			 << '\t' << file << ':' << line << endl;
 	}
 }
