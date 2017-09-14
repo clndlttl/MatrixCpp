@@ -12,7 +12,6 @@ int main()
 	Column<int> c(col);
 	Matrix2D<int> M(3,3,mat);
 
-	int res = r*M*c;
-
-	cout << res;
+	Matrix2D<int> res = c*r*M;
+	res.show();
 }

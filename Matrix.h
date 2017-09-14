@@ -122,7 +122,7 @@ class Matrix2D
 
 		matrix.push_back(row);
 		numRows++;
-		if( 0 == matrix.size() )
+		if( 1 == numRows )
 		{
 			numCols = row.size();	 
 		}						
@@ -195,7 +195,7 @@ void Row<T>::show()
 	{
 		cout << ' ' << i;
 	}
-	cout << endl;
+	cout << endl << endl;
 }
 
 template <class T>
@@ -405,7 +405,7 @@ void Row<T>::checkDimensions( int N, const char* file, int line )
 template <class T>
 void Matrix2D<T>::checkDimensions( int N, const char* file, int line )
 {
-	if ( N != numCols )
+	if ( (numRows > 0) && (N != numCols) )
 	{
 		cout << "Dimension mismatch! "
 			 << numCols << " != " << N << endl
