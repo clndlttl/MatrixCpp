@@ -148,6 +148,9 @@ class Matrix2D
 	Matrix2D<T> operator*(Matrix2D<T> m_rhs);
 	Matrix2D<T> operator*(const T s);
 	template <class G> friend Matrix2D<G> operator*(const G s, Matrix2D<G> me);
+
+	// exponent
+	Matrix2D<T> operator^(int pow);
 	
 	// addition
 	Matrix2D<T> operator+(Matrix2D<T> m);
@@ -420,6 +423,26 @@ template <class G>
 Matrix2D<G> operator*(const G s, Matrix2D<G> me)
 {
 	return me * s;
+}
+
+
+
+	/* Exponent
+	 *
+	 */
+
+template <class T>
+Matrix2D<T> Matrix2D<T>::operator^(int pow)
+{
+	checkDimensions( numRows, __FILE__, __LINE__ );
+
+	Matrix2D<T> M_rv = *this;
+
+	for(int i = 1; i < pow; i++)
+	{
+		M_rv = M_rv * (*this); 
+	}
+	return M_rv;
 }
 
 

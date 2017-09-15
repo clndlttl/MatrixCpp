@@ -14,7 +14,10 @@ int main()
 	Column<int> c(col);
 	Matrix2D<int> M(3,3,mat);
 
-	Matrix2D<int> res = 3*M - c*r ; 
-	
+	Matrix2D<int> M2( 5, 5 );
+
+	Matrix2D<int> res = M2^2;
+ 
 	res.show();
+
 }
