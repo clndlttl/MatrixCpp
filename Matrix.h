@@ -121,7 +121,7 @@ class Matrix2D
   public:
 	Matrix2D(){ numRows = numCols = 0; }
 	Matrix2D<T>( int rows, int cols );
-	Matrix2D<T>( int rows, int cols, vector<T>& vals );
+	Matrix2D<T>( int rows, int cols, vector<T>& v );
 		
 	// show matrix
 	void show();
@@ -189,7 +189,6 @@ Matrix2D<T>::Matrix2D( int rows, int cols )
 template <class T>
 Matrix2D<T>::Matrix2D( int rows, int cols, vector<T>& v )
 {
-
 	numRows = rows;
 	numCols = cols;
 	auto ptr = v.begin();
