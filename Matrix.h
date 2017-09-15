@@ -139,24 +139,31 @@ class Matrix2D
 		}						
 	}
 
-	// get num rows and cols
+	// get private data
 	int getNumRows(){ return numRows; }
 	int getNumCols(){ return numCols; }
 
+	// set private data
+	void setNumRows(int r){ numRows = r; }
+	void setNumCols(int c){ numCols = c; }
+	
+	// return a reference to private matrix
+	vector< vector<T> >* getMatrix(){ return &matrix; }
+
 	// multiplication
-	Column<T> operator*(Column<T> c);
-	Matrix2D<T> operator*(Matrix2D<T> m_rhs);
-	Matrix2D<T> operator*(const T s);
+	virtual Column<T> operator*(Column<T> c);
+	virtual Matrix2D<T> operator*(Matrix2D<T> m_rhs);
+	virtual Matrix2D<T> operator*(const T s);
 	template <class G> friend Matrix2D<G> operator*(const G s, Matrix2D<G> me);
 
 	// exponent
-	Matrix2D<T> operator^(int pow);
+	virtual Matrix2D<T> operator^(int pow);
 	
 	// addition
-	Matrix2D<T> operator+(Matrix2D<T> m);
+	virtual Matrix2D<T> operator+(Matrix2D<T> m);
 	
 	// subtraction
-	Matrix2D<T> operator-(Matrix2D<T> m);	
+	virtual Matrix2D<T> operator-(Matrix2D<T> m);	
 
 	// at[]
 	vector<T>& operator[](int idx){ return matrix[idx]; }

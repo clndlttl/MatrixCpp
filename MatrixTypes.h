@@ -4,38 +4,34 @@
 #include "Matrix.h"
 
 template <class T>
-class Diag : public Matrix2D
+class Diag : public Matrix2D<T>
 {
   public:
-	Diag<T>( const vector<T>& v )
+	Diag<T>( const vector<T>& v ) : Matrix2D<T>( v.size(), v.size() )
 	{
-		numRows = numCols = v.size();
+		int size = v.size();
+		auto mat = this->getMatrix();
 
-		for(int i=0; i < numRows; i++)
+		for(int i=0; i < size; i++)
 		{
-			vector<T> tmp( numCols );
-			tmp[i] = v[i];
-			matrix.push_back( tmp );
+			(*mat)[i][i] = v[i];
 		}
 	}	
-}
+};
 
 template <class T>
-class Eye : public Matrix2D
+class Eye : public Matrix2D<T>
 {
   public:
-	Eye<T>( int size )
+	Eye<T>( int size ) : Matrix2D<T>( size, size ) 
 	{
-		numRows = numCols = size;
-
-		for(int i=0; i < numRows; i++)
+		auto mat = this->getMatrix();
+		for(int i=0; i < size; i++)
 		{
-			vector<T> tmp( numCols );
-			tmp[i] = static_cast<T>(1);
-			matrix.push_back( tmp );
+			(*mat)[i][i] = static_cast<T>(1);
 		}
 	}
-}
+};
 
 
 

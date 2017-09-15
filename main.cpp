@@ -1,5 +1,5 @@
 #include "Matrix.h"
-#include "Operations.h"
+#include "MatrixTypes.h"
 
 int main()
 {
@@ -14,9 +14,7 @@ int main()
 	Column<double> c(col);
 	Matrix2D<double> M(3,3,mat);
 
-	Matrix2D<double> M2( 5, 5 );
-
-	Matrix2D<double> res = M2^2;
+	Eye<double> res( 5 );	
  
 	res.show();
 
