@@ -10,11 +10,10 @@ class Diag : public Matrix2D<T>
 	Diag<T>( const vector<T>& v ) : Matrix2D<T>( v.size(), v.size() )
 	{
 		int size = v.size();
-		auto mat = this->getMatrix();
 
 		for(int i=0; i < size; i++)
 		{
-			(*mat)[i][i] = v[i];
+			this->matrix[i][i] = v[i];
 		}
 	}	
 };
@@ -25,10 +24,9 @@ class Eye : public Matrix2D<T>
   public:
 	Eye<T>( int size ) : Matrix2D<T>( size, size ) 
 	{
-		auto mat = this->getMatrix();
 		for(int i=0; i < size; i++)
 		{
-			(*mat)[i][i] = static_cast<T>(1);
+			this->matrix[i][i] = static_cast<T>(1);
 		}
 	}
 };

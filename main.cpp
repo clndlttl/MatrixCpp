@@ -15,8 +15,11 @@ int main()
 	Column<double> c(col);
 	Matrix2D<double> M(3,3,mat);
 
+	M.show();
+
 	LUdecomp<double> lu( 3, mat );
 	lu.decompose();
-	lu.show(); // still shows input mat
+	lu.show();
+
 }
 

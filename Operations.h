@@ -26,6 +26,35 @@ class LUdecomp : public Matrix2D<T>
 
 	bool validate();
 
+	void show()
+	{
+		int size = this->numRows;
+
+		// Show L
+		cout << "L:" << endl;
+		for(int r=0; r < size; r++)
+		{
+			for(int c=0; c < size; c++)
+			{
+				cout << ' ' << L[r][c];
+			}
+			cout << endl;
+		}
+		cout << endl;
+	
+		// Show U
+		cout << "U:" << endl;	
+		for(int r=0; r < size; r++)
+		{
+			for(int c=0; c < size; c++)
+			{
+				cout << ' ' << U[r][c];
+			}
+			cout << endl;
+		}
+		cout << endl;
+	}
+
 	void decompose()
 	{
 		// init LowerTri to eye.
@@ -38,21 +67,15 @@ class LUdecomp : public Matrix2D<T>
 		//
 		// the next non-zero element is past i,j
 		
-		int size = this->getNumRows();
-		auto mat = this->getMatrix();
+		int size = this->numRows;
 
 		L = Eye<T>( size );
-		U = *(mat);
+		U = this->matrix;
 
 		// size^2/2 - size/2
-		// 2x2 = 2 - 1
-		// 3x3 = 4.5 - 1.5
-		// 4x4 = 8 - 2
-		// 5x5 = 12.5 - 2.5
 		int numToDo = static_cast<int>( 0.5*(size^2 - size) ); 
 
 		int start_i = 1;
-		int start_j = 0;
 
 		// ensure matrix[0][0] != 0
 		// debug:
@@ -61,25 +84,24 @@ class LUdecomp : public Matrix2D<T>
 			cout << "problem " << __FILE__ << ':' << __LINE__ << endl; 
 		}
 
-		for(int k=0; k < numToDo; k++)
+		for(int j=0; j < size; j++)
 		{
-			for(int j=start_j; j < size; j++)
+			for(int i=start_i; i < size; i++ )
 			{
-				for(int i=start_i; i < size; i++ )
+				if( U[i][j] && ( static_cast<T>(0) != U[j][j] ) )
 				{
-					if( U[i][j] )
-					{
-						double C = -1.0*U[i][j] / U[j][j];
-						Row<T> thisRow( U[i] );
-						Row<T> multRow( U[j] );
-						Row<T> newRow = thisRow + C*multRow;
-						U[i] = *newRow.getRowVec();
+					double C = -1.0*U[i][j] / U[j][j];
 						
-						L[i][j] = C;
+					for(int z=0; z < size; z++)
+					{
+						U[i][z] = U[i][z] + C * U[j][z]; 
 					}
+					
+					L[i][j] = C;
 				}
 			}
-		}	
+			start_i++;
+		}
 	}
 };
 

@@ -24,7 +24,7 @@ template <class T> class Matrix2D;
 template< class T >
 class Row
 {
-  private:
+  protected:
 	vector<T> data;
 
   public:
@@ -36,7 +36,7 @@ class Row
 	void show();
 
 	// get row vec
-	vector<T>* getRowVec(){ return &data; }
+	vector<T>* getRowVecPtr(){ return &data; }
 
 	// add element
 	void add(T val){ data.push_back(val); }
@@ -71,7 +71,7 @@ class Row
 template< class T >
 class Column
 {
-  private:	
+  protected:	
 	vector<T> data;
  
   public:
@@ -116,7 +116,7 @@ class Column
 template <class T>
 class Matrix2D
 {
-  private:
+  protected:
 	vector< vector<T> > matrix;	
 	int numRows;
 	int numCols;
@@ -128,7 +128,7 @@ class Matrix2D
 	Matrix2D<T>( vector< vector<T>>& vv );
 		
 	// show matrix
-	void show();
+	virtual void show();
 	
 	// add element
 	void add(vector<T>& row)
@@ -213,11 +213,11 @@ Matrix2D<T>::Matrix2D( int rows, int cols, vector<T>& v )
 }
 
 template <class T>
-Matrix2D<T>::Matrix2D( vector< vector<T> >& v )
+Matrix2D<T>::Matrix2D( vector< vector<T> >& vv )
 {
-	numRows = v.size();
-	numCols = v[0].size();
-	matrix = v;
+	numRows = vv.size();
+	numCols = vv[0].size();
+	matrix = vv;
 }
 
 	/* Show
