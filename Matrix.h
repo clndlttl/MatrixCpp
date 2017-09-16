@@ -35,6 +35,9 @@ class Row
 	// show row
 	void show();
 
+	// get row vec
+	vector<T>* getRowVec(){ return &data; }
+
 	// add element
 	void add(T val){ data.push_back(val); }
 
@@ -122,6 +125,7 @@ class Matrix2D
 	Matrix2D(){ numRows = numCols = 0; }
 	Matrix2D<T>( int rows, int cols );
 	Matrix2D<T>( int rows, int cols, vector<T>& v );
+	Matrix2D<T>( vector< vector<T>>& vv );
 		
 	// show matrix
 	void show();
@@ -208,7 +212,13 @@ Matrix2D<T>::Matrix2D( int rows, int cols, vector<T>& v )
 	}
 }
 
-
+template <class T>
+Matrix2D<T>::Matrix2D( vector< vector<T> >& v )
+{
+	numRows = v.size();
+	numCols = v[0].size();
+	matrix = v;
+}
 
 	/* Show
  	 *
