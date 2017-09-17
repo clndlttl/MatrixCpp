@@ -100,9 +100,4 @@ class LUdecomp : public Matrix2D<T>
 };
 
 
-
-
-
-
-
 #endif

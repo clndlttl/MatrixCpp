@@ -5,18 +5,14 @@
 int main()
 {
 
-	vector<double> mat = { 1, 0, 0, 0,
-						   0, 1, 0, 0,
-						   0, 0, 1, 0,
-					       0, 0, 0, 1 };
+	vector<double> mat = { 1, -3,
+						   4, -2 };
 
-	Matrix2D<double> M(4,4,mat);
+	Matrix2D<double> M(2,2,mat);
 
-	LUdecomp<double> lu( 4, mat );
+	LUdecomp<double> lu( 2, mat );
 	lu.decompose();
-	cout << lu.validate() << endl;
-
-	cout << (M == lu) << endl;
+	lu.show();
 
 }
 
