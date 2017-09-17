@@ -59,8 +59,8 @@ class Row
 	// checkDimensions
 	void checkDimensions( int N, const char* file, int line );
 
-	// get size of data
-	int getDataSize(){ return data.size(); }
+	// get length of row
+	int getLength(){ return data.size(); }
 
 };
 
@@ -99,8 +99,8 @@ class Column
 	// at[]
 	T& operator[](int idx){ return data[idx]; }
 
-	// get size of data
-	int getDataSize(){ return data.size(); }
+	// get length of column
+	int getLength(){ return data.size(); }
   
 	// checkDimensions
 	void checkDimensions( int N, const char* file, int line );
@@ -146,10 +146,6 @@ class Matrix2D
 	// get private data
 	int getNumRows(){ return numRows; }
 	int getNumCols(){ return numCols; }
-
-	// set private data
-	void setNumRows(int r){ numRows = r; }
-	void setNumCols(int c){ numCols = c; }
 	
 	// return a reference to private matrix
 	vector< vector<T> >* getMatrix(){ return &matrix; }
@@ -171,6 +167,31 @@ class Matrix2D
 
 	// at[]
 	vector<T>& operator[](int idx){ return matrix[idx]; }
+
+	// equality
+	bool operator==( Matrix2D<T>& m )
+	{
+		if ( matrix == *( m.getMatrix() ) )
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}	
+	}
+
+	bool operator==( vector< vector<T> >& v )
+	{
+		if ( matrix == v )
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}	
+	}
 
 	// checkDimensions
 	void checkDimensions( int N, const char* file, int line );
@@ -290,10 +311,10 @@ Row<G> operator*(const G s, Row<G> me)
 template <class T>
 T Row<T>::operator*(Column<T> c)
 {
-	checkDimensions( c.getDataSize(), __FILE__, __LINE__ );
+	checkDimensions( c.getLength(), __FILE__, __LINE__ );
 
 	T scal_rv = static_cast<T>(0);
-	for(int i=0; i < c.getDataSize(); i++)
+	for(int i=0; i < c.getLength(); i++)
 	{
 		scal_rv += data[i] * c[i];
 	}
@@ -351,7 +372,7 @@ template <class T>
 Matrix2D<T> Column<T>::operator*(Row<T> r)
 {
 	Matrix2D<T> M;
-	int n = r.getDataSize();
+	int n = r.getLength();
 
 	for(int i=0; i < data.size(); i++)
 	{
@@ -370,7 +391,7 @@ Matrix2D<T> Column<T>::operator*(Row<T> r)
 template <class T>
 Column<T> Matrix2D<T>::operator*(Column<T> c)
 {
-	int size = c.getDataSize();
+	int size = c.getLength();
 	checkDimensions( size, __FILE__, __LINE__ );
 
 	Column<T> col_rv( numRows );
@@ -469,7 +490,7 @@ Matrix2D<T> Matrix2D<T>::operator^(int pow)
 template <class T>
 Row<T> Row<T>::operator+( Row<T> r )
 {
-	checkDimensions( r.getDataSize(), __FILE__, __LINE__ );
+	checkDimensions( r.getLength(), __FILE__, __LINE__ );
 	
 	int size = data.size();
 	Row<T> row_rv( size );
@@ -484,7 +505,7 @@ Row<T> Row<T>::operator+( Row<T> r )
 template <class T>
 Column<T> Column<T>::operator+( Column<T> c )
 {
-	checkDimensions( c.getDataSize(), __FILE__, __LINE__ );
+	checkDimensions( c.getLength(), __FILE__, __LINE__ );
 	
 	int size = data.size();
 	Column<T> col_rv( size );
@@ -523,7 +544,7 @@ Matrix2D<T> Matrix2D<T>::operator+( Matrix2D<T> m )
 template <class T>
 Row<T> Row<T>::operator-( Row<T> r )
 {
-	checkDimensions( r.getDataSize(), __FILE__, __LINE__ );
+	checkDimensions( r.getLength(), __FILE__, __LINE__ );
 	
 	int size = data.size();
 	Row<T> row_rv( size );
@@ -538,7 +559,7 @@ Row<T> Row<T>::operator-( Row<T> r )
 template <class T>
 Column<T> Column<T>::operator-( Column<T> c )
 {
-	checkDimensions( c.getDataSize(), __FILE__, __LINE__ );
+	checkDimensions( c.getLength(), __FILE__, __LINE__ );
 	
 	int size = data.size();
 	Column<T> col_rv( size );

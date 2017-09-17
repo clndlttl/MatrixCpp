@@ -4,12 +4,6 @@
 #include "Matrix.h"
 #include "MatrixTypes.h"
 
-enum class STATUS
-{
-	OK,
-	ERROR
-};
-
 
 template <class T>
 class LUdecomp : public Matrix2D<T>
@@ -24,7 +18,14 @@ class LUdecomp : public Matrix2D<T>
 	LUdecomp<T>( int size ): Matrix2D<T>( size, size ){}
 	LUdecomp<T>( int size, vector<T>& v ): Matrix2D<T>( size, size, v ){}
 
-	bool validate();
+	bool validate()
+	{
+		if ( this->numRows > 0 )
+		{
+			Matrix2D<T> A = L*U;
+			return A == *this;
+		}
+	}
 
 	void show()
 	{
@@ -77,24 +78,17 @@ class LUdecomp : public Matrix2D<T>
 
 		int start_i = 1;
 
-		// ensure matrix[0][0] != 0
-		// debug:
-		if( U[0][0] == static_cast<T>(0) )
-		{
-			cout << "problem " << __FILE__ << ':' << __LINE__ << endl; 
-		}
-
 		for(int j=0; j < size; j++)
 		{
 			for(int i=start_i; i < size; i++ )
 			{
 				if( U[i][j] && ( static_cast<T>(0) != U[j][j] ) )
 				{
-					double C = -1.0*U[i][j] / U[j][j];
+					double C = U[i][j] / U[j][j];
 						
 					for(int z=0; z < size; z++)
 					{
-						U[i][z] = U[i][z] + C * U[j][z]; 
+						U[i][z] = U[i][z] - C * U[j][z]; 
 					}
 					
 					L[i][j] = C;
