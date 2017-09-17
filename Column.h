@@ -104,7 +104,7 @@ Matrix2D<T> Column<T>::operator*(Row<T> r)
 		{
 			newRow[j] = data[i] * r[j];
 		}
-		M.add( newRow );
+		M.addRow( newRow );
 	}
 	return M;
 }

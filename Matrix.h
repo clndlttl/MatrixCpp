@@ -12,8 +12,10 @@
 #include <iostream>
 #include "Row.h"
 #include "Column.h"
+#include "MatrixTypes.h"
 
 using namespace std;
+
 
 	/* Matrix2D
  	 *
@@ -37,7 +39,7 @@ class Matrix2D
 	virtual void show();
 	
 	// add element
-	void add(vector<T>& row)
+	void addRow(vector<T>& row)
 	{
 		checkDimensions( row.size(), __FILE__, __LINE__ );
 
@@ -103,6 +105,24 @@ class Matrix2D
 	void checkDimensions( int N, const char* file, int line );
 	void checkDimensionsAddSub( int NR, int NC, const char* file, int line );
 
+	// transpose
+	Matrix2D<T> t()
+	{
+		Matrix2D<T> m_rv;
+
+		for(int j=0; j < numCols; j++)
+		{
+			vector<T> tmp( numRows );
+			for(int i=0; i < numRows; i++)
+			{
+				tmp[i] = matrix[i][j];
+			}
+			m_rv.addRow( tmp );
+		}
+
+		return m_rv;
+	}
+
 };
 
 
@@ -120,6 +140,7 @@ Matrix2D<T>::Matrix2D( int rows, int cols )
 	}
 }
 
+
 template <class T>
 Matrix2D<T>::Matrix2D( int rows, int cols, vector<T>& v )
 {
@@ -134,6 +155,7 @@ Matrix2D<T>::Matrix2D( int rows, int cols, vector<T>& v )
 		ptr += numCols;
 	}
 }
+
 
 template <class T>
 Matrix2D<T>::Matrix2D( vector< vector<T> >& vv )
@@ -204,7 +226,7 @@ Matrix2D<T> Matrix2D<T>::operator*(Matrix2D<T> m_rhs)
 			}
 			newRow[j] = accum;	 	
 		}
-		M.add( newRow );
+		M.addRow( newRow );
 	}
 	return M;
 }
@@ -223,10 +245,11 @@ Matrix2D<T> Matrix2D<T>::operator*(const T s)
 		{
 			newRow[j] = matrix[i][j] * s;
 		}
-		M.add( newRow );
+		M.addRow( newRow );
 	}
 	return M;
 }
+
 
 template <class G>
 Matrix2D<G> operator*(const G s, Matrix2D<G> me)
@@ -235,26 +258,41 @@ Matrix2D<G> operator*(const G s, Matrix2D<G> me)
 }
 
 
-
-	/* Exponent
-	 *
-	 */
-
 template <class T>
 Matrix2D<T> Matrix2D<T>::operator^(int pow)
 {
 	checkDimensions( numRows, __FILE__, __LINE__ );
 
-	Matrix2D<T> M_rv = *this;
+	Matrix2D<T> M_rv;
 
-	for(int i = 1; i < pow; i++)
+	if (pow >= 1)
 	{
-		M_rv = M_rv * (*this); 
+		M_rv = *this;
+		for(int i = 1; i < pow; i++)
+		{
+			M_rv = M_rv * (*this); 
+		}
 	}
+	else if ( 0 == pow )
+	{
+		M_rv = Eye<T>( numRows ); 
+	}
+	else if ( -1 == pow )
+	{
+		M_rv = LUdecomp<T>( matrix ).invert();
+	}
+	else
+	{
+		M_rv = LUdecomp<T>( matrix ).invert();
+		auto inv = M_rv;
+		for(int i = -1; i > pow; i--)
+		{	
+			M_rv = M_rv * LUdecomp<T>( matrix ).invert();
+		}
+	}
+
 	return M_rv;
 }
-
-
 
 
 template <class T>
@@ -271,7 +309,7 @@ Matrix2D<T> Matrix2D<T>::operator+( Matrix2D<T> m )
 		{
 			newRow[j] = matrix[i][j] + m[i][j];
 		}
-		M_rv.add( newRow );
+		M_rv.addRow( newRow );
 	}
 	return M_rv;
 }
@@ -291,16 +329,10 @@ Matrix2D<T> Matrix2D<T>::operator-( Matrix2D<T> m )
 		{
 			newRow[j] = matrix[i][j] - m[i][j];
 		}
-		M_rv.add( newRow );
+		M_rv.addRow( newRow );
 	}
 	return M_rv;
 }
-
-
-	/* Error Detection
-	 *
-	 */
-
 
 
 template <class T>
@@ -313,6 +345,7 @@ void Matrix2D<T>::checkDimensions( int N, const char* file, int line )
 			 << '\t' << file << ':' << line << endl;
 	}
 }
+
 
 template <class T>
 void Matrix2D<T>::checkDimensionsAddSub( int NR, int NC, const char* file, int line )
@@ -331,8 +364,6 @@ void Matrix2D<T>::checkDimensionsAddSub( int NR, int NC, const char* file, int l
 			 << '\t' << file << ':' << line << endl;
 	}
 }
-
-
 
 
 #endif // MATRIX_H
