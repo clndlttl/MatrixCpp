@@ -2,14 +2,9 @@
 #ifndef ROW_H
 #define ROW_H true
 
-#include <vector>
-#include <iostream>
-
+#include "Vec.h"
 #include "Column.h"
 #include "Matrix.h"
-
-using namespace std;
-
 
 
 	/* Row
@@ -18,24 +13,15 @@ using namespace std;
 
 
 template< class T >
-class Row
+class Row : public Vec<T>
 {
   protected:
 	vector<T> data;
 
   public:
 	Row(){}
-	Row(int n){ data.resize(n); }
-    Row<T>(const vector<T>& v){ data = v; }
-
-	// show row
-	void show();
-
-	// get row vec
-	vector<T>* getRowVecPtr(){ return &data; }
-
-	// add element
-	void add(T val){ data.push_back(val); }
+	Row(int size ): Vec<T>( size ){}
+    Row<T>(const vector<T>& v): Vec<T>(v){}
 
 	// multiplication
 	Row<T> operator*(const T s);
@@ -49,25 +35,7 @@ class Row
 	// subtraction
 	Row<T> operator-(Row<T> r);	
 
-	// at[]
-	T& operator[](int idx){ return data[idx]; }
-
-	// checkDimensions
-	void checkDimensions( int N, const char* file, int line );
-
-	// get length of row
-	int getLength(){ return data.size(); }
-
 };
-template <class T>
-void Row<T>::show()
-{
-	for(auto i : data)
-	{
-		cout << ' ' << i;
-	}
-	cout << endl << endl;
-}
 
 
 // row by scalar
@@ -113,7 +81,7 @@ Row<T> Row<T>::operator*(Matrix2D<T> m)
 	int mat_numRows = m.getNumRows();
 	int mat_numCols = m.getNumCols();
 
-	checkDimensions( mat_numRows, __FILE__, __LINE__ );
+	this->checkDimensions( mat_numRows, __FILE__, __LINE__ );
 
 	Row<T> row_rv( mat_numCols );
 	for(int i=0; i < mat_numCols; i++)
@@ -168,17 +136,6 @@ Row<T> Row<T>::operator-( Row<T> r )
 	return row_rv;
 }
 
-
-template <class T>
-void Row<T>::checkDimensions( int N, const char* file, int line )
-{
-	if ( N != data.size() )
-	{
-		cout << "Dimension mismatch! "
-			 << data.size() << " != " << N << endl
-			 << '\t' << file << ':' << line << endl;
-	}
-}
 
 
 #endif // ROW_H

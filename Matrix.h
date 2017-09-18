@@ -8,14 +8,13 @@
 #ifndef MATRIX_H
 #define MATRIX_H true
 
-#include <vector>
-#include <iostream>
 #include "Row.h"
 #include "Column.h"
-#include "MatrixTypes.h"
 
-using namespace std;
-
+template <class T> class Eye;
+template <class T> class LU;
+template <class T> class Column;
+template <class T> class Row;
 
 	/* Matrix2D
  	 *
@@ -279,15 +278,15 @@ Matrix2D<T> Matrix2D<T>::operator^(int pow)
 	}
 	else if ( -1 == pow )
 	{
-		M_rv = LUdecomp<T>( matrix ).invert();
+		M_rv = LU<T>( matrix ).invert();
 	}
 	else
 	{
-		M_rv = LUdecomp<T>( matrix ).invert();
+		M_rv = LU<T>( matrix ).invert();
 		auto inv = M_rv;
 		for(int i = -1; i > pow; i--)
 		{	
-			M_rv = M_rv * LUdecomp<T>( matrix ).invert();
+			M_rv = M_rv * LU<T>( matrix ).invert();
 		}
 	}
 

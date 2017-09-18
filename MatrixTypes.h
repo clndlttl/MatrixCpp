@@ -1,5 +1,5 @@
 #ifndef MATRIXTYPES_H
-#define MATRIXTYPES_H
+#define MATRIXTYPES_H true
 
 #include "Matrix.h"
 
@@ -33,7 +33,7 @@ class Eye : public Matrix2D<T>
 
 
 template <class T>
-class LUdecomp : public Matrix2D<T>
+class LU : public Matrix2D<T>
 {
   private:
 	Matrix2D<T> L;
@@ -41,10 +41,10 @@ class LUdecomp : public Matrix2D<T>
 	// ...and matrix from base class
 
   public:
-	LUdecomp(){}
-	LUdecomp<T>( int size ): Matrix2D<T>( size, size ){}
-	LUdecomp<T>( int size, vector<T>& v ): Matrix2D<T>( size, size, v ){}
-	LUdecomp<T>( vector< vector<T>>& vv ): Matrix2D<T>( vv )
+	LU(){}
+	LU<T>( int size ): Matrix2D<T>( size, size ){}
+	LU<T>( int size, vector<T>& v ): Matrix2D<T>( size, size, v ){}
+	LU<T>( vector< vector<T>>& vv ): Matrix2D<T>( vv )
 	{
 		decompose();
 		if ( ! isValid() )
@@ -189,7 +189,4 @@ class LUdecomp : public Matrix2D<T>
 };
 
 
-
-
-
-#endif
+#endif // MATRIXTYPES_H

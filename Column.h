@@ -1,24 +1,18 @@
 #ifndef COLUMN_H
 #define COLUMN_H true
 
-#include <vector>
-#include <iostream>
-
+#include "Vec.h"
 #include "Row.h"
 #include "Matrix.h"
 
 using namespace std;
-
-template <class T> class Matrix2D;
-template <class T> class Row;
-
 
 	/* Column
  	 *
  	 */
 
 template< class T >
-class Column
+class Column : public Vec<T>
 {
   protected:	
 	vector<T> data;
@@ -45,12 +39,6 @@ class Column
 	// subtraction
 	Column<T> operator-(Column<T> c);	
 
-	// at[]
-	T& operator[](int idx){ return data[idx]; }
-
-	// get length of column
-	int getLength(){ return data.size(); }
-  
 	// checkDimensions
 	void checkDimensions( int N, const char* file, int line );
 
@@ -141,17 +129,6 @@ Column<T> Column<T>::operator-( Column<T> c )
 	return col_rv;
 }
 
-
-template <class T>
-void Column<T>::checkDimensions( int N, const char* file, int line )
-{
-	if ( N != data.size() )
-	{
-		cout << "Dimension mismatch! "
-			 << data.size() << " != " << N << endl
-			 << '\t' << file << ':' << line << endl;
-	}
-}
 
 
 #endif // COLUMN_H

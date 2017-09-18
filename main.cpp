@@ -1,5 +1,7 @@
-#include "Matrix.h"
+#include "VectorTypes.h"
 #include "MatrixTypes.h"
+
+using namespace std;
 
 int main()
 {
@@ -20,6 +22,9 @@ int main()
 
 	Matrix2D<T> eye2 = M * (M^(-1));
 	eye2.show();
+
+	Vec<T> v( mat );
+	v.show();
 
 }
 
