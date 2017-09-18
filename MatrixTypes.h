@@ -3,6 +3,7 @@
 
 #include "Matrix.h"
 
+
 template <class T>
 class Diag : public Matrix2D<T>
 {
@@ -17,6 +18,7 @@ class Diag : public Matrix2D<T>
 		}
 	}	
 };
+
 
 template <class T>
 class Eye : public Matrix2D<T>
@@ -46,7 +48,15 @@ class LU : public Matrix2D<T>
 	LU<T>( int size, vector<T>& v ): Matrix2D<T>( size, size, v ){}
 	LU<T>( vector< vector<T>>& vv ): Matrix2D<T>( vv )
 	{
-		decompose();
+		if( ! this->isSquare() )
+		{
+			cout << "not a square matrix in LU ctor" << endl;
+		}
+		else
+		{
+			decompose();
+		}
+
 		if ( ! isValid() )
 		{
 			cout << "LU decomp failed" << endl;

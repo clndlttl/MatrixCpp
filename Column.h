@@ -14,20 +14,15 @@ using namespace std;
 template< class T >
 class Column : public Vec<T>
 {
-  protected:	
-	vector<T> data;
  
   public:
 	Column(){}
-	Column(int n){ data.resize(n); }
-    Column<T>(const vector<T>& v){ data = v; }
+	Column(int n): Vec<T>( n ){}
+    Column<T>(const vector<T>& v): Vec<T>( v ){}
 
 	// show
 	void show();
 	
-	// add element
-	void add(T val){ data.push_back(val); }
-
 	// multiplication
 	Column<T> operator*(const T s);
 	template <class G> friend Column<G> operator*(const G s, Column<G> me);
@@ -39,8 +34,17 @@ class Column : public Vec<T>
 	// subtraction
 	Column<T> operator-(Column<T> c);	
 
-	// checkDimensions
-	void checkDimensions( int N, const char* file, int line );
+	// transpose
+	Row<T> t()
+	{
+		int size = this->data.size();
+		Row<T> row_rv( size );
+		for (int i=0; i < size; i++)
+		{
+			row_rv[i] = this->data[i];
+		}
+		return row_rv;
+	}	
 
 };
 
@@ -48,7 +52,7 @@ class Column : public Vec<T>
 template <class T>
 void Column<T>::show()
 {
-	for(auto i : data)
+	for(auto i : this->data)
 	{
 		cout << ' ' << i << endl;
 	}
@@ -60,12 +64,12 @@ void Column<T>::show()
 template <class T>
 Column<T> Column<T>::operator*(const T s)
 {
-	int size = data.size();
+	int size = this->data.size();
 	Column<T> col_rv( size );
 
 	for(int i=0; i < size; i++)
 	{
-		col_rv[i] = s * data[i];
+		col_rv[i] = s * this->data[i];
 	}
 	return col_rv;
 }
@@ -85,12 +89,12 @@ Matrix2D<T> Column<T>::operator*(Row<T> r)
 	Matrix2D<T> M;
 	int n = r.getLength();
 
-	for(int i=0; i < data.size(); i++)
+	for(int i=0; i < this->data.size(); i++)
 	{
 		vector<T> newRow( n );
 		for(int j=0; j < n; j++)
 		{
-			newRow[j] = data[i] * r[j];
+			newRow[j] = this->data[i] * r[j];
 		}
 		M.addRow( newRow );
 	}
@@ -103,12 +107,12 @@ Column<T> Column<T>::operator+( Column<T> c )
 {
 	checkDimensions( c.getLength(), __FILE__, __LINE__ );
 	
-	int size = data.size();
+	int size = this->data.size();
 	Column<T> col_rv( size );
 
 	for(int i=0; i < size; i++)
 	{
-		col_rv[i] = data[i]+c[i];		
+		col_rv[i] = this->data[i]+c[i];		
 	}
 	return col_rv;
 }
@@ -119,12 +123,12 @@ Column<T> Column<T>::operator-( Column<T> c )
 {
 	checkDimensions( c.getLength(), __FILE__, __LINE__ );
 	
-	int size = data.size();
+	int size = this->data.size();
 	Column<T> col_rv( size );
 
 	for(int i=0; i < size; i++)
 	{
-		col_rv[i] = data[i]-c[i];		
+		col_rv[i] = this->data[i]-c[i];		
 	}
 	return col_rv;
 }

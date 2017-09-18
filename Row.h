@@ -15,13 +15,11 @@
 template< class T >
 class Row : public Vec<T>
 {
-  protected:
-	vector<T> data;
 
   public:
 	Row(){}
 	Row(int size ): Vec<T>( size ){}
-    Row<T>(const vector<T>& v): Vec<T>(v){}
+    Row<T>(const vector<T>& v): Vec<T>( v ){}
 
 	// multiplication
 	Row<T> operator*(const T s);
@@ -35,6 +33,17 @@ class Row : public Vec<T>
 	// subtraction
 	Row<T> operator-(Row<T> r);	
 
+	// transpose
+	Column<T> t()
+	{
+		int size = this->data.size();
+		Column<T> col_rv( size );
+		for (int i=0; i < size; i++)
+		{
+			col_rv[i] = this->data[i];
+		}
+		return col_rv;
+	}	
 };
 
 
@@ -42,12 +51,12 @@ class Row : public Vec<T>
 template <class T>
 Row<T> Row<T>::operator*(const T s)
 {
-	int size = data.size();
+	int size = this->data.size();
 	Row<T> row_rv( size );
 
 	for (int i=0; i < size; i++)
 	{
-		row_rv[i] = data[i] * s;
+		row_rv[i] = this->data[i] * s;
 	}
 	return row_rv;
 }
@@ -68,7 +77,7 @@ T Row<T>::operator*(Column<T> c)
 	T scal_rv = static_cast<T>(0);
 	for(int i=0; i < c.getLength(); i++)
 	{
-		scal_rv += data[i] * c[i];
+		scal_rv += this->data[i] * c[i];
 	}
 	return scal_rv;
 }
@@ -89,7 +98,7 @@ Row<T> Row<T>::operator*(Matrix2D<T> m)
 		T accum = static_cast<T>(0);
 		for(int j=0; j < mat_numRows; j++)
 		{
-			accum += data[j] * m[j][i];
+			accum += this->data[j] * m[j][i];
 		}
 		row_rv[i] = accum;
 	}
@@ -106,12 +115,12 @@ Row<T> Row<T>::operator+( Row<T> r )
 {
 	checkDimensions( r.getLength(), __FILE__, __LINE__ );
 	
-	int size = data.size();
+	int size = this->data.size();
 	Row<T> row_rv( size );
 
 	for(int i=0; i < size; i++)
 	{
-		row_rv[i] = data[i]+r[i];		
+		row_rv[i] = this->data[i]+r[i];		
 	}
 	return row_rv;
 }
@@ -126,12 +135,12 @@ Row<T> Row<T>::operator-( Row<T> r )
 {
 	checkDimensions( r.getLength(), __FILE__, __LINE__ );
 	
-	int size = data.size();
+	int size = this->data.size();
 	Row<T> row_rv( size );
 
 	for(int i=0; i < size; i++)
 	{
-		row_rv[i] = data[i]-r[i];		
+		row_rv[i] = this->data[i]-r[i];		
 	}
 	return row_rv;
 }

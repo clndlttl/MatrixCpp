@@ -122,6 +122,8 @@ class Matrix2D
 		return m_rv;
 	}
 
+	bool isSquare(){ return numRows == numCols; }
+
 };
 
 
@@ -143,6 +145,11 @@ Matrix2D<T>::Matrix2D( int rows, int cols )
 template <class T>
 Matrix2D<T>::Matrix2D( int rows, int cols, vector<T>& v )
 {
+	if( v.size() < (rows*cols) )
+	{
+		cout << "vector too short!" << endl;
+	}
+
 	numRows = rows;
 	numCols = cols;
 	auto ptr = v.begin();
