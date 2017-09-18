@@ -285,15 +285,31 @@ Matrix2D<T> Matrix2D<T>::operator^(int pow)
 	}
 	else if ( -1 == pow )
 	{
-		M_rv = LU<T>( matrix ).invert();
+		LU<T> lu( matrix );
+		if ( ! lu.isValid() )
+		{
+			cout << "LU decomp failed in M^-1" << endl;
+		}
+		else
+		{
+			M_rv = lu.invert();
+		}
 	}
 	else
 	{
-		M_rv = LU<T>( matrix ).invert();
-		auto inv = M_rv;
-		for(int i = -1; i > pow; i--)
-		{	
-			M_rv = M_rv * LU<T>( matrix ).invert();
+		LU<T> lu( matrix );
+		if ( ! lu.isValid() )
+		{
+			cout << "LU decomp failed in M^-1" << endl;
+		}
+		else
+		{
+			M_rv = lu.invert();
+			auto inv = M_rv;
+			for(int i = -1; i > pow; i--)
+			{	
+				M_rv = M_rv * inv;
+			}
 		}
 	}
 

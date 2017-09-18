@@ -40,13 +40,9 @@ class LU : public Matrix2D<T>
   private:
 	Matrix2D<T> L;
 	Matrix2D<T> U;
-	// ...and matrix from base class
 
-  public:
-	LU(){}
-	LU<T>( int size ): Matrix2D<T>( size, size ){}
-	LU<T>( int size, vector<T>& v ): Matrix2D<T>( size, size, v ){}
-	LU<T>( vector< vector<T>>& vv ): Matrix2D<T>( vv )
+	void decompose();
+	void safeDecompose()
 	{
 		if( ! this->isSquare() )
 		{
@@ -56,11 +52,22 @@ class LU : public Matrix2D<T>
 		{
 			decompose();
 		}
+	}
 
-		if ( ! isValid() )
-		{
-			cout << "LU decomp failed" << endl;
-		}
+  public:
+	LU<T>( int size, vector<T>& v ): Matrix2D<T>( size, size, v )
+	{
+		safeDecompose();
+	}
+
+	LU<T>( vector< vector<T>>& vv ): Matrix2D<T>( vv )
+	{
+		safeDecompose();
+	}
+
+	LU<T>( Matrix2D<T>& m ): Matrix2D<T>( m )
+	{
+		safeDecompose();
 	}
 
 	bool isValid()
@@ -72,84 +79,100 @@ class LU : public Matrix2D<T>
 		}
 	}
 
-	void show()
-	{
-		int size = this->numRows;
+	void show();
 
-		// Show L
-		cout << "L:" << endl;
-		for(int r=0; r < size; r++)
+	Matrix2D<T> invert();
+
+	// still need a way to tell if the matrix is
+	// invertable based on the LU
+
+};
+
+
+template <class T>
+void LU<T>::show()
+{
+	int size = this->numRows;
+
+	// Show L
+	cout << "L:" << endl;
+	for(int r=0; r < size; r++)
+	{
+		for(int c=0; c < size; c++)
 		{
-			for(int c=0; c < size; c++)
-			{
-				cout << ' ' << L[r][c];
-			}
-			cout << endl;
+			cout << ' ' << L[r][c];
 		}
 		cout << endl;
+	}
+	cout << endl;
 	
-		// Show U
-		cout << "U:" << endl;	
-		for(int r=0; r < size; r++)
+	// Show U
+	cout << "U:" << endl;	
+	for(int r=0; r < size; r++)
+	{
+		for(int c=0; c < size; c++)
 		{
-			for(int c=0; c < size; c++)
-			{
-				cout << ' ' << U[r][c];
-			}
-			cout << endl;
+			cout << ' ' << U[r][c];
 		}
 		cout << endl;
 	}
+	cout << endl;
+}
 
-	void decompose()
+
+template <class T>
+void LU<T>::decompose()
+{
+	// init LowerTri to eye.
+	//
+	// go to first non-zero element in the lower half of matrix
+	// by travelling down columns, at i,j. (1-based: i*j >= 2, i > j)
+	// mult row i-1 by (-1*matrix[i][j] / matrix[j][j]) and
+	// add it to row i. substitute the result of the add
+	// to row i.  Save the value to LowerTri[i][j]. 
+	//
+	// the next non-zero element is past i,j
+		
+	int size = this->numRows;
+
+	L = Eye<T>( size );
+	U = this->matrix;
+
+	// size^2/2 - size/2
+	int numToDo = static_cast<int>( 0.5*(size^2 - size) ); 
+
+	int start_i = 1;
+
+	for(int j=0; j < size; j++)
 	{
-		// init LowerTri to eye.
-		//
-		// go to first non-zero element in the lower half of matrix
-		// by travelling down columns, at i,j. (1-based: i*j >= 2, i > j)
-		// mult row i-1 by (-1*matrix[i][j] / matrix[j][j]) and
-		// add it to row i. substitute the result of the add
-		// to row i.  Save the value to LowerTri[i][j]. 
-		//
-		// the next non-zero element is past i,j
-		
-		int size = this->numRows;
-
-		L = Eye<T>( size );
-		U = this->matrix;
-
-		// size^2/2 - size/2
-		int numToDo = static_cast<int>( 0.5*(size^2 - size) ); 
-
-		int start_i = 1;
-
-		for(int j=0; j < size; j++)
+		for(int i=start_i; i < size; i++ )
 		{
-			for(int i=start_i; i < size; i++ )
+			if( U[i][j] && ( static_cast<T>(0) != U[j][j] ) )
 			{
-				if( U[i][j] && ( static_cast<T>(0) != U[j][j] ) )
-				{
-					double C = U[i][j] / U[j][j];
-						
-					for(int z=0; z < size; z++)
-					{
-						U[i][z] = U[i][z] - C * U[j][z]; 
-					}
+				double C = U[i][j] / U[j][j];
 					
-					L[i][j] = C;
+				for(int z=0; z < size; z++)
+				{
+					U[i][z] = U[i][z] - C * U[j][z]; 
 				}
+				
+				L[i][j] = C;
 			}
-			start_i++;
 		}
+		start_i++;
 	}
+}
 
-	Matrix2D<T> invert()
-	{	// assume LU exist already
-		// check for squareness
-		int size = this->numRows;
+
+template <class T>
+Matrix2D<T> LU<T>::invert()
+{
+	int size = this->numRows;
 		
-		Matrix2D<T> m_rv( size, size );
-
+	Matrix2D<T> m_rv( size, size );
+		
+	if( size > 0 )
+	{
 		Eye<T> I( size );
 
 		// for each column of the inverse
@@ -169,13 +192,10 @@ class LU : public Matrix2D<T>
 				{
 					accum += L[i][a] * y[a];
 				}
-
 				y[i] = ( I[i][c] - accum ) / L[i][i];
 			}
-
 			// then solve for x:  Ux = y
 			// bottom-up
-
 			for(i = size-1; i > -1; i--)
 			{
 				T accum = static_cast<T>(0);
@@ -184,19 +204,25 @@ class LU : public Matrix2D<T>
 				{
 					accum += U[i][a] * x[a]; 
 				}
-
 				x[i] = ( y[i] - accum ) / U[i][i];
 			}		
-			
+		
 			// add col x to return var 
 			for(i = 0; i < size; i++)
 			{
 				m_rv[i][c] = x[i];
 			}
 		}
-		return m_rv;
 	}
-};
+	else
+	{
+		cout << "matrix invert called on empty data!" << endl;
+		cout << "	returning zeros" << endl;
+	}
+
+	return m_rv;
+}
+
 
 
 #endif // MATRIXTYPES_H
