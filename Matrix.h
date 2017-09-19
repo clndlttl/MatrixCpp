@@ -11,6 +11,9 @@
 #include "Row.h"
 #include "Column.h"
 
+#define OK true
+#define ERROR false
+
 template <class T> class Eye;
 template <class T> class LU;
 template <class T> class Column;
@@ -58,19 +61,16 @@ class Matrix2D
 	vector< vector<T> >* getMatrix(){ return &matrix; }
 
 	// multiplication
-	virtual Column<T> operator*(Column<T> c);
-	virtual Matrix2D<T> operator*(Matrix2D<T> m_rhs);
-	virtual Matrix2D<T> operator*(const T s);
+	Column<T> operator*(Column<T> c);
+	Matrix2D<T> operator*(Matrix2D<T>& m_rhs);
+	Matrix2D<T> operator*(const T s);
 	template <class G> friend Matrix2D<G> operator*(const G s, Matrix2D<G> me);
 
-	// exponent
-	virtual Matrix2D<T> operator^(int pow);
-	
 	// addition
-	virtual Matrix2D<T> operator+(Matrix2D<T> m);
+	Matrix2D<T> operator+(Matrix2D<T> m);
 	
 	// subtraction
-	virtual Matrix2D<T> operator-(Matrix2D<T> m);	
+	Matrix2D<T> operator-(Matrix2D<T> m);	
 
 	// at[]
 	vector<T>& operator[](int idx){ return matrix[idx]; }
@@ -122,7 +122,7 @@ class Matrix2D
 		return m_rv;
 	}
 
-	bool isSquare(){ return numRows == numCols; }
+	virtual bool isSquare(){ return numRows == numCols; }
 
 };
 
@@ -147,7 +147,7 @@ Matrix2D<T>::Matrix2D( int rows, int cols, vector<T>& v )
 {
 	if( v.size() < (rows*cols) )
 	{
-		cout << "vector too short!" << endl;
+		cout << "vector too short in Matrix2D ctor!" << endl;
 	}
 
 	numRows = rows;
@@ -211,7 +211,7 @@ Column<T> Matrix2D<T>::operator*(Column<T> c)
 	
 // mat by mat
 template <class T>
-Matrix2D<T> Matrix2D<T>::operator*(Matrix2D<T> m_rhs)
+Matrix2D<T> Matrix2D<T>::operator*(Matrix2D<T>& m_rhs)
 {
 	int rhs_numRows = m_rhs.getNumRows();
 	int rhs_numCols = m_rhs.getNumCols();
@@ -264,57 +264,6 @@ Matrix2D<G> operator*(const G s, Matrix2D<G> me)
 }
 
 
-template <class T>
-Matrix2D<T> Matrix2D<T>::operator^(int pow)
-{
-	checkDimensions( numRows, __FILE__, __LINE__ );
-
-	Matrix2D<T> M_rv;
-
-	if (pow >= 1)
-	{
-		M_rv = *this;
-		for(int i = 1; i < pow; i++)
-		{
-			M_rv = M_rv * (*this); 
-		}
-	}
-	else if ( 0 == pow )
-	{
-		M_rv = Eye<T>( numRows ); 
-	}
-	else if ( -1 == pow )
-	{
-		LU<T> lu( matrix );
-		if ( ! lu.isValid() )
-		{
-			cout << "LU decomp failed in M^-1" << endl;
-		}
-		else
-		{
-			M_rv = lu.invert();
-		}
-	}
-	else
-	{
-		LU<T> lu( matrix );
-		if ( ! lu.isValid() )
-		{
-			cout << "LU decomp failed in M^-1" << endl;
-		}
-		else
-		{
-			M_rv = lu.invert();
-			auto inv = M_rv;
-			for(int i = -1; i > pow; i--)
-			{	
-				M_rv = M_rv * inv;
-			}
-		}
-	}
-
-	return M_rv;
-}
 
 
 template <class T>

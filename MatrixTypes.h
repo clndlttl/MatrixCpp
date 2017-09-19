@@ -3,12 +3,107 @@
 
 #include "Matrix.h"
 
-
 template <class T>
-class Diag : public Matrix2D<T>
+class Square : public Matrix2D<T>
 {
   public:
-	Diag<T>( const vector<T>& v ) : Matrix2D<T>( v.size(), v.size() )
+	Square<T>(){}
+	Square<T>( int size ) : Matrix2D<T>( size, size ){}
+	Square<T>( int size, vector<T>& v ): Matrix2D<T>( size, size, v){} 
+	Square<T>( vector< vector<T>>& vv ): Matrix2D<T>( vv )
+	{
+		if( (vv.size() == 0) || 
+			(vv.size() != vv[0].size()) )
+		{
+			cout << "Bad dimensions in Square ctor" << endl;
+		}
+	}
+	Square<T>( Matrix2D<T> m ): Matrix2D<T>( m )
+	{
+		int r = m.getNumRows();
+		int c = m.getNumCols();
+
+		if( (r == 0) || 
+			(r != c) )
+		{
+			cout << "Bad dimensions in Square ctor" << endl;
+		}
+	}
+
+	bool isSquare(){ return true; }
+
+	T trace()
+	{
+		T accum = static_cast<T>( 0 );
+		for(int i=0; i < this->numRows; i++)
+		{
+			accum *= this->matrix[i][i];
+		}
+		return accum;
+	}
+
+	Square<T> inv(){ return *(this)^(-1); }
+
+	Square<T> operator^(int pow);
+
+};
+
+template <class T>
+Square<T> Square<T>::operator^(int pow)
+{
+	Square<T> M_rv;
+
+	if (pow >= 1)
+	{
+		M_rv = *this;
+		for(int i = 1; i < pow; i++)
+		{
+			M_rv = M_rv * (*this); 
+		}
+	}
+	else if ( 0 == pow )
+	{
+		M_rv = Eye<T>( this->numRows ); 
+	}
+	else if ( -1 == pow )
+	{
+		LU<T> lu( this->matrix );
+		if ( ! lu.isValid() )
+		{
+			cout << "LU decomp failed in M^-1" << endl;
+		}
+		else
+		{
+			M_rv = lu.invert();
+		}
+	}
+	else
+	{
+		LU<T> lu( this->matrix );
+		if ( ! lu.isValid() )
+		{
+			cout << "LU decomp failed in M^-1" << endl;
+		}
+		else
+		{
+			M_rv = lu.invert();
+			auto tmp = M_rv;
+			for(int i = -1; i > pow; i--)
+			{	
+				M_rv = M_rv * tmp;
+			}
+		}
+	}
+
+	return M_rv;
+}
+
+
+template <class T>
+class Diag : public Square<T>
+{
+  public:
+	Diag<T>( const vector<T>& v ) : Square<T>( v.size() )
 	{
 		int size = v.size();
 
@@ -21,10 +116,10 @@ class Diag : public Matrix2D<T>
 
 
 template <class T>
-class Eye : public Matrix2D<T>
+class Eye : public Square<T>
 {
   public:
-	Eye<T>( int size ) : Matrix2D<T>( size, size ) 
+	Eye<T>( int size ) : Square<T>( size ) 
 	{
 		for(int i=0; i < size; i++)
 		{
@@ -35,53 +130,44 @@ class Eye : public Matrix2D<T>
 
 
 template <class T>
-class LU : public Matrix2D<T>
+class LU : public Square<T>
 {
   private:
-	Matrix2D<T> L;
-	Matrix2D<T> U;
+	Square<T> L;
+	Square<T> U;
 
 	void decompose();
-	void safeDecompose()
-	{
-		if( ! this->isSquare() )
-		{
-			cout << "not a square matrix in LU ctor" << endl;
-		}
-		else
-		{
-			decompose();
-		}
-	}
 
   public:
-	LU<T>( int size, vector<T>& v ): Matrix2D<T>( size, size, v )
+	LU<T>(){}
+
+	LU<T>( int size, vector<T>& v ): Square<T>( size, v )
 	{
-		safeDecompose();
+		decompose();
 	}
 
-	LU<T>( vector< vector<T>>& vv ): Matrix2D<T>( vv )
+	LU<T>( vector< vector<T>>& vv ): Square<T>( vv )
 	{
-		safeDecompose();
+		decompose();
 	}
 
-	LU<T>( Matrix2D<T>& m ): Matrix2D<T>( m )
+	LU<T>( Matrix2D<T>& m ): Square<T>( m )
 	{
-		safeDecompose();
+		decompose();
 	}
 
 	bool isValid()
 	{
 		if ( this->numRows > 0 )
 		{
-			Matrix2D<T> A = L*U;
+			Square<T> A = L*U;
 			return A == *this;
 		}
 	}
 
 	void show();
 
-	Matrix2D<T> invert();
+	Square<T> invert();
 
 	// still need a way to tell if the matrix is
 	// invertable based on the LU
@@ -139,7 +225,7 @@ void LU<T>::decompose()
 	U = this->matrix;
 
 	// size^2/2 - size/2
-	int numToDo = static_cast<int>( 0.5*(size^2 - size) ); 
+	// int numToDo = static_cast<int>( 0.5*(size^2 - size) ); 
 
 	int start_i = 1;
 
@@ -165,11 +251,11 @@ void LU<T>::decompose()
 
 
 template <class T>
-Matrix2D<T> LU<T>::invert()
+Square<T> LU<T>::invert()
 {
 	int size = this->numRows;
 		
-	Matrix2D<T> m_rv( size, size );
+	Square<T> m_rv( size );
 		
 	if( size > 0 )
 	{

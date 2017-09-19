@@ -12,8 +12,16 @@ int main()
    					  0, 0, 1, 0,
    					  2, 0, 0, 1 };
 
-	LU<T> lu( 4, mat );
-	Matrix2D<T> inv = lu.invert();
-	inv.show();
+	Square<T> M( 4, mat );
+	M.show();
+
+	Eye<T> I( 4 );
+	I.show();
+
+	Square<T> M2( M*I );
+	M2.show();
+
+	//Square<T> Minv = lu.invert();
+	//Minv.show();
 }
 
