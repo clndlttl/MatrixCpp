@@ -64,7 +64,7 @@ class Matrix2D
 	Column<T> operator*(Column<T> c);
 	Matrix2D<T> operator*(Matrix2D<T>& m_rhs);
 	Matrix2D<T> operator*(const T s);
-	template <class G> friend Matrix2D<G> operator*(const G s, Matrix2D<G> me);
+	template <class G> friend Matrix2D<G> operator*(const G s, Matrix2D<G>& me);
 
 	// addition
 	Matrix2D<T> operator+(Matrix2D<T> m);
@@ -258,7 +258,7 @@ Matrix2D<T> Matrix2D<T>::operator*(const T s)
 
 
 template <class G>
-Matrix2D<G> operator*(const G s, Matrix2D<G> me)
+Matrix2D<G> operator*(const G s, Matrix2D<G>& me)
 {
 	return me * s;
 }

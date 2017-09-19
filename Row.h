@@ -72,7 +72,7 @@ Row<G> operator*(const G s, Row<G> me)
 template <class T>
 T Row<T>::operator*(Column<T> c)
 {
-	checkDimensions( c.getLength(), __FILE__, __LINE__ );
+	this->checkDimensions( c.getLength(), __FILE__, __LINE__ );
 
 	T scal_rv = static_cast<T>(0);
 	for(int i=0; i < c.getLength(); i++)

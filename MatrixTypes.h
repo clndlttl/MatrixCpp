@@ -42,7 +42,7 @@ class Square : public Matrix2D<T>
 		return accum;
 	}
 
-	Square<T> inv(){ return *(this)^(-1); }
+	virtual Square<T> inv(){ return *(this)^(-1); }
 
 	Square<T> operator^(int pow);
 
@@ -74,7 +74,7 @@ Square<T> Square<T>::operator^(int pow)
 		}
 		else
 		{
-			M_rv = lu.invert();
+			M_rv = lu.inv();
 		}
 	}
 	else
@@ -86,7 +86,7 @@ Square<T> Square<T>::operator^(int pow)
 		}
 		else
 		{
-			M_rv = lu.invert();
+			M_rv = lu.inv();
 			auto tmp = M_rv;
 			for(int i = -1; i > pow; i--)
 			{	
@@ -167,7 +167,7 @@ class LU : public Square<T>
 
 	void show();
 
-	Square<T> invert();
+	Square<T> inv();
 
 	// still need a way to tell if the matrix is
 	// invertable based on the LU
@@ -251,7 +251,7 @@ void LU<T>::decompose()
 
 
 template <class T>
-Square<T> LU<T>::invert()
+Square<T> LU<T>::inv()
 {
 	int size = this->numRows;
 		

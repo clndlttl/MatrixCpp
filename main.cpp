@@ -7,21 +7,23 @@ int main()
 {
 	using T = double;
 
-	vector<T> mat = { 1, 0, 0, 0,
-					  0, 1, 0, 0,
-   					  0, 0, 1, 0,
-   					  2, 0, 0, 1 };
+	vector<T> mat = { 1, 0, 0, -3,
+					  0, 1, -1, 0,
+   					  -1, 0, 1, 0,
+   					  0, 2, 0, 1 };
 
 	Square<T> M( 4, mat );
 	M.show();
+	(M^-1).show();
 
-	Eye<T> I( 4 );
-	I.show();
+	LU<T> lu( M );
+	lu.show();
+	cout << "valid " << lu.isValid() << endl;
 
-	Square<T> M2( M*I );
-	M2.show();
+	Square<T> Minv = lu.inv();
+	Minv.show();
 
-	//Square<T> Minv = lu.invert();
-	//Minv.show();
+	Square<T> back = Minv.inv(); // not working
+	back.show();
 }
 
