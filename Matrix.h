@@ -38,7 +38,7 @@ class Matrix2D
 	Matrix2D<T>( const vector< vector<T>>& vv );
 		
 	// show matrix
-	virtual void show();
+	virtual void show() const;
 	
 	// add element
 	void addRow(vector<T>& row)
@@ -179,7 +179,7 @@ Matrix2D<T>::Matrix2D( const vector< vector<T> >& vv )
 
 
 template <class T>
-void Matrix2D<T>::show()
+void Matrix2D<T>::show() const
 {
 	for(int r=0; r<numRows; r++)
 	{
@@ -224,8 +224,6 @@ Matrix2D<T> Matrix2D<T>::operator*(const Matrix2D<T>& m_rhs)
 
 	checkDimensions( rhs_numRows, __FILE__, __LINE__ );
 
-	Matrix2D<T> M;
-
 	for(int i=0; i < numRows; i++)
 	{
 		vector<T> newRow( rhs_numCols );
@@ -238,9 +236,9 @@ Matrix2D<T> Matrix2D<T>::operator*(const Matrix2D<T>& m_rhs)
 			}
 			newRow[j] = accum;	 	
 		}
-		M.addRow( newRow );
+		matrix[i] = newRow;
 	}
-	return M;
+	return *this;
 }
 	
 
@@ -248,18 +246,14 @@ Matrix2D<T> Matrix2D<T>::operator*(const Matrix2D<T>& m_rhs)
 template <class T>
 Matrix2D<T> Matrix2D<T>::operator*(const T& s)
 {
-	Matrix2D<T> M;
-
 	for(int i=0; i < numRows; i++)
 	{
-		vector<T> newRow(numCols);
 		for(int j=0; j < numCols; j++)
 		{
-			newRow[j] = matrix[i][j] * s;
+			matrix[i][j] *= s;
 		}
-		M.addRow( newRow );
 	}
-	return M;
+	return *this;
 }
 
 
@@ -277,18 +271,14 @@ Matrix2D<T> Matrix2D<T>::operator+( const Matrix2D<T>& m )
 {
 	checkDimensionsAddSub( m.getNumRows(), m.getNumCols(), __FILE__, __LINE__ );
 
-	Matrix2D<T> M_rv;
-
 	for(int i=0; i < numRows; i++)
 	{
-		vector<T> newRow( numCols );
  		for(int j=0; j < numCols; j++)
 		{
-			newRow[j] = matrix[i][j] + m[i][j];
+			matrix[i][j] += m[i][j];
 		}
-		M_rv.addRow( newRow );
 	}
-	return M_rv;
+	return *this;
 }
 
 
@@ -297,18 +287,14 @@ Matrix2D<T> Matrix2D<T>::operator-( const Matrix2D<T>& m )
 {
 	checkDimensionsAddSub( m.getNumRows(), m.getNumCols(), __FILE__, __LINE__ );
 
-	Matrix2D<T> M_rv;
-
 	for(int i=0; i < numRows; i++)
 	{
-		vector<T> newRow( numCols );
  		for(int j=0; j < numCols; j++)
 		{
-			newRow[j] = matrix[i][j] - m[i][j];
+			matrix[i][j] -= m[i][j];
 		}
-		M_rv.addRow( newRow );
 	}
-	return M_rv;
+	return *this;
 }
 
 

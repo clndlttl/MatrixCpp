@@ -33,13 +33,13 @@ class Vec
 	void add(T val){ data.push_back(val); }
 
 	// read-only at[]
-	T operator[](int idx){ return data[idx]; }
+	T operator[](int idx) const { return data[idx]; }
 
 	// checkDimensions
 	void checkDimensions( int N, const char* file, int line );
 
 	// get length of row
-	int getLength(){ return data.size(); }
+	int getLength() const { return data.size(); }
 
 };
 

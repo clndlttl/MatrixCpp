@@ -7,7 +7,7 @@ template <class T>
 class Square : public Matrix2D<T>
 {
   private:
-	vector< Square<T> > perm_queue;
+	Square<T> perm( int size, int r1, int r2 );
 
   public:
 	Square<T>(){}
@@ -50,7 +50,6 @@ class Square : public Matrix2D<T>
 
 	Square<T> operator^(int pow);
 
-	Square<T> perm( int size, int r1, int r2 );
 };
 
 template <class T>
@@ -145,9 +144,6 @@ Square<T> Square<T>::perm( int size, int r1, int r2 )
 	M[r2] = M[r1];
 	M[r1] = tmp;
 
-	cout << "P: " << endl;
-	I.show();
-
 	return I;
 }
 
@@ -169,31 +165,46 @@ Square<T> Square<T>::inv()
 	Square<T> U_mat( this->matrix );
 	auto U = U_mat.getMatrix();
 
-	// If needed, apply permutations to ensure LU decomp
+	// init Permutation matrix to Identity
+	Square<T> P = L_mat;	
+
+	//******** If needed, apply permutations
+	bool swapNeeded = false;
 
 	for(int i=0; i < size; i++)
 	{
 		if( ! U[i][i] )
 		{
-			for(int x = i+1; x < size; x++) // might change to x=0
+			swapNeeded = true;
+		
+			for(int x = 0; x < size; x++)
 			{
-				if( U[x][i] && U[i][x] )
+				if( U[x][i] )
 				{
 					// swap those rows
 					vector<T> tmp = U[x];
 					U[x] = U[i];
 					U[i] = tmp;
 
-					// push this permutation to the queue
-					perm_queue.push_back( perm( size, i, x ) );
+					// permutation the existing permutation
+					P = perm( size, i, x) * P;
 
-					cout << "perm: swapped rows " << i << "and" << x << endl;
+					cout << "perm: swapped rows " << i << " <--> " << x << endl;
+					swapNeeded = false;
+					break;
 				}
+			}
+
+			if( swapNeeded )
+			{
+				// matrix is not invertible
+				cout << "Not full rank in inv(), aborting inverse" << endl;
+				return *this;
 			}
 		}
 	}
 
-	// Do the LU decomp
+	//******** Do the LU decomp
 	// init LowerTri to eye.
 	//
 	// go to first non-zero element in the lower half of matrix
@@ -224,9 +235,7 @@ Square<T> Square<T>::inv()
 		start_i++;
 	}
 
-	cout << "L and U" << endl;
-	L_mat.show();
-	U_mat.show();
+	//******* sanity check **************
 
 	if ( ! ( (*this) == (L_mat * U_mat) ) )
 	{
@@ -234,11 +243,10 @@ Square<T> Square<T>::inv()
 		return *this;
 	}
 
-
 	//******* solve system of eqns ******
 		
 	Square<T> M_inv( size );
-	auto setM_inv = M_inv.getMatrix(); 
+	vector< vector<T>>& setM_inv = M_inv.getMatrix(); 
 		
 	const Eye<T> I( size );
 
@@ -279,18 +287,11 @@ Square<T> Square<T>::inv()
 		{
 			setM_inv[i][c] = x[i];
 		}
-
-		// apply permutations, if any
-		if ( int n = perm_queue.size() )
-		{
-			for(int i=n-1; i > -1; i++)
-			{
-				M_inv = M_inv * perm_queue[i];
-			}
-		}
 	}
 
-	return M_inv;
+	// undo permutations and return
+
+	return M_inv * P;
 }
 
 

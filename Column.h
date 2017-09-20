@@ -65,13 +65,12 @@ template <class T>
 Column<T> Column<T>::operator*(const T& s)
 {
 	int size = this->data.size();
-	Column<T> col_rv( size );
 
 	for(int i=0; i < size; i++)
 	{
-		col_rv[i] = s * this->data[i];
+		this->data[i] *= s;
 	}
-	return col_rv;
+	return *this;
 }
 
 template <class G>
@@ -108,13 +107,12 @@ Column<T> Column<T>::operator+( const Column<T>& c )
 	checkDimensions( c.getLength(), __FILE__, __LINE__ );
 	
 	int size = this->data.size();
-	Column<T> col_rv( size );
 
 	for(int i=0; i < size; i++)
 	{
-		col_rv[i] = this->data[i]+c[i];		
+		this->data[i] += c[i];		
 	}
-	return col_rv;
+	return *this;
 }
 
 
@@ -124,13 +122,12 @@ Column<T> Column<T>::operator-( const Column<T>& c )
 	checkDimensions( c.getLength(), __FILE__, __LINE__ );
 	
 	int size = this->data.size();
-	Column<T> col_rv( size );
 
 	for(int i=0; i < size; i++)
 	{
-		col_rv[i] = this->data[i]-c[i];		
+		this->data[i] -= c[i];		
 	}
-	return col_rv;
+	return *this;
 }
 
 

@@ -52,13 +52,12 @@ template <class T>
 Row<T> Row<T>::operator*(const T& s)
 {
 	int size = this->data.size();
-	Row<T> row_rv( size );
 
 	for (int i=0; i < size; i++)
 	{
-		row_rv[i] = this->data[i] * s;
+		this->data[i] *= s;
 	}
-	return row_rv;
+	return *this;
 }
 
 template <class G>
@@ -92,7 +91,8 @@ Row<T> Row<T>::operator*(const Matrix2D<T>& m)
 
 	this->checkDimensions( mat_numRows, __FILE__, __LINE__ );
 
-	Row<T> row_rv( mat_numCols );
+	vector<T> newData( mat_numRows );
+
 	for(int i=0; i < mat_numCols; i++)
 	{
 		T accum = static_cast<T>(0);
@@ -100,9 +100,11 @@ Row<T> Row<T>::operator*(const Matrix2D<T>& m)
 		{
 			accum += this->data[j] * m[j][i];
 		}
-		row_rv[i] = accum;
+		newData[i] = accum;
 	}
-	return row_rv;
+	this->data = newData;
+
+	return *this;
 }
 
 
@@ -116,13 +118,12 @@ Row<T> Row<T>::operator+( const Row<T>& r )
 	checkDimensions( r.getLength(), __FILE__, __LINE__ );
 	
 	int size = this->data.size();
-	Row<T> row_rv( size );
 
 	for(int i=0; i < size; i++)
 	{
-		row_rv[i] = this->data[i]+r[i];		
+		this->data[i] += r[i];		
 	}
-	return row_rv;
+	return *this;
 }
 
 
@@ -136,13 +137,12 @@ Row<T> Row<T>::operator-( const Row<T>& r )
 	checkDimensions( r.getLength(), __FILE__, __LINE__ );
 	
 	int size = this->data.size();
-	Row<T> row_rv( size );
 
 	for(int i=0; i < size; i++)
 	{
-		row_rv[i] = this->data[i]-r[i];		
+		this->data[i] -= r[i];		
 	}
-	return row_rv;
+	return *this;
 }
 
 
