@@ -27,13 +27,13 @@ class Vec
 	virtual void show();
 
 	// get row vec
-	vector<T>* getVecVecPtr(){ return &data; }
+	vector<T>& getVec(){ return data; }
 
 	// add element
 	void add(T val){ data.push_back(val); }
 
-	// at[]
-	T& operator[](int idx){ return data[idx]; }
+	// read-only at[]
+	T operator[](int idx){ return data[idx]; }
 
 	// checkDimensions
 	void checkDimensions( int N, const char* file, int line );

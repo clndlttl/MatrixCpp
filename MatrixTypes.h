@@ -6,11 +6,14 @@
 template <class T>
 class Square : public Matrix2D<T>
 {
+  private:
+	vector< Square<T> > perm_queue;
+
   public:
 	Square<T>(){}
 	Square<T>( int size ) : Matrix2D<T>( size, size ){}
-	Square<T>( int size, vector<T>& v ): Matrix2D<T>( size, size, v){} 
-	Square<T>( vector< vector<T>>& vv ): Matrix2D<T>( vv )
+	Square<T>( int size, const vector<T>& v ): Matrix2D<T>( size, size, v){} 
+	Square<T>( const vector< vector<T>>& vv ): Matrix2D<T>( vv )
 	{
 		if( (vv.size() == 0) || 
 			(vv.size() != vv[0].size()) )
@@ -18,7 +21,7 @@ class Square : public Matrix2D<T>
 			cout << "Bad dimensions in Square ctor" << endl;
 		}
 	}
-	Square<T>( Matrix2D<T> m ): Matrix2D<T>( m )
+	Square<T>( const Matrix2D<T>& m ): Matrix2D<T>( m )
 	{
 		int r = m.getNumRows();
 		int c = m.getNumCols();
@@ -26,7 +29,8 @@ class Square : public Matrix2D<T>
 		if( (r == 0) || 
 			(r != c) )
 		{
-			cout << "Bad dimensions in Square ctor" << endl;
+			cout << "Bad dimensions in Square ctor" <<  endl;
+			cout << "r " << r << " c " << c << endl;
 		}
 	}
 
@@ -42,10 +46,11 @@ class Square : public Matrix2D<T>
 		return accum;
 	}
 
-	virtual Square<T> inv(){ return *(this)^(-1); }
+	Square<T> inv();
 
 	Square<T> operator^(int pow);
 
+	Square<T> perm( int size, int r1, int r2 );
 };
 
 template <class T>
@@ -67,32 +72,30 @@ Square<T> Square<T>::operator^(int pow)
 	}
 	else if ( -1 == pow )
 	{
-		LU<T> lu( this->matrix );
-		if ( ! lu.isValid() )
-		{
-			cout << "LU decomp failed in M^-1" << endl;
-		}
-		else
-		{
-			M_rv = lu.inv();
-		}
+//		if ( ! lu.isValid() )
+//		{
+//			cout << "LU decomp failed in M^-1" << endl;
+//		}
+//		else
+//		{
+			M_rv = inv();
+//		}
 	}
 	else
 	{
-		LU<T> lu( this->matrix );
-		if ( ! lu.isValid() )
-		{
-			cout << "LU decomp failed in M^-1" << endl;
-		}
-		else
-		{
-			M_rv = lu.inv();
+//		if ( ! lu.isValid() )
+//		{
+//			cout << "LU decomp failed in M^-1" << endl;
+//		}
+//		else
+//		{
+			M_rv = inv();
 			auto tmp = M_rv;
 			for(int i = -1; i > pow; i--)
 			{	
 				M_rv = M_rv * tmp;
 			}
-		}
+//		}
 	}
 
 	return M_rv;
@@ -129,86 +132,68 @@ class Eye : public Square<T>
 };
 
 
-template <class T>
-class LU : public Square<T>
-{
-  private:
-	Square<T> L;
-	Square<T> U;
-
-	void decompose();
-
-  public:
-	LU<T>(){}
-
-	LU<T>( int size, vector<T>& v ): Square<T>( size, v )
-	{
-		decompose();
-	}
-
-	LU<T>( vector< vector<T>>& vv ): Square<T>( vv )
-	{
-		decompose();
-	}
-
-	LU<T>( Matrix2D<T>& m ): Square<T>( m )
-	{
-		decompose();
-	}
-
-	bool isValid()
-	{
-		if ( this->numRows > 0 )
-		{
-			Square<T> A = L*U;
-			return A == *this;
-		}
-	}
-
-	void show();
-
-	Square<T> inv();
-
-	// still need a way to tell if the matrix is
-	// invertable based on the LU
-
-};
 
 
 template <class T>
-void LU<T>::show()
+Square<T> Square<T>::perm( int size, int r1, int r2 )
 {
-	int size = this->numRows;
+	Eye<T> I( size );
 
-	// Show L
-	cout << "L:" << endl;
-	for(int r=0; r < size; r++)
-	{
-		for(int c=0; c < size; c++)
-		{
-			cout << ' ' << L[r][c];
-		}
-		cout << endl;
-	}
-	cout << endl;
-	
-	// Show U
-	cout << "U:" << endl;	
-	for(int r=0; r < size; r++)
-	{
-		for(int c=0; c < size; c++)
-		{
-			cout << ' ' << U[r][c];
-		}
-		cout << endl;
-	}
-	cout << endl;
+	vector< vector<T>>& M = I.getMatrix();
+
+	vector<T> tmp = M[r2];
+	M[r2] = M[r1];
+	M[r1] = tmp;
+
+	cout << "P: " << endl;
+	I.show();
+
+	return I;
 }
 
 
 template <class T>
-void LU<T>::decompose()
+Square<T> Square<T>::inv()
 {
+	int size = this->numRows;
+
+	if ( 0 == size )
+	{
+		cout << "wtf, size 0 in inv()" << endl;
+		return *this;
+	}
+
+	Eye<T> L_mat( size );
+	auto L = L_mat.getMatrix();
+
+	Square<T> U_mat( this->matrix );
+	auto U = U_mat.getMatrix();
+
+	// If needed, apply permutations to ensure LU decomp
+
+	for(int i=0; i < size; i++)
+	{
+		if( ! U[i][i] )
+		{
+			for(int x = i+1; x < size; x++) // might change to x=0
+			{
+				if( U[x][i] && U[i][x] )
+				{
+					// swap those rows
+					vector<T> tmp = U[x];
+					U[x] = U[i];
+					U[i] = tmp;
+
+					// push this permutation to the queue
+					perm_queue.push_back( perm( size, i, x ) );
+
+					cout << "perm: swapped rows " << i << "and" << x << endl;
+				}
+			}
+		}
+	}
+
+	// Do the LU decomp
 	// init LowerTri to eye.
 	//
 	// go to first non-zero element in the lower half of matrix
@@ -218,22 +203,13 @@ void LU<T>::decompose()
 	// to row i.  Save the value to LowerTri[i][j]. 
 	//
 	// the next non-zero element is past i,j
-		
-	int size = this->numRows;
-
-	L = Eye<T>( size );
-	U = this->matrix;
-
-	// size^2/2 - size/2
-	// int numToDo = static_cast<int>( 0.5*(size^2 - size) ); 
-
 	int start_i = 1;
 
 	for(int j=0; j < size; j++)
 	{
 		for(int i=start_i; i < size; i++ )
 		{
-			if( U[i][j] && ( static_cast<T>(0) != U[j][j] ) )
+			if( U[i][j] && U[j][j] )
 			{
 				double C = U[i][j] / U[j][j];
 					
@@ -247,66 +223,74 @@ void LU<T>::decompose()
 		}
 		start_i++;
 	}
-}
 
+	cout << "L and U" << endl;
+	L_mat.show();
+	U_mat.show();
 
-template <class T>
-Square<T> LU<T>::inv()
-{
-	int size = this->numRows;
-		
-	Square<T> m_rv( size );
-		
-	if( size > 0 )
+	if ( ! ( (*this) == (L_mat * U_mat) ) )
 	{
-		Eye<T> I( size );
+		cout << "LU != A" << endl;
+		return *this;
+	}
 
-		// for each column of the inverse
-		for(int c=0; c < size; c++)
-		{
-			// solve for y:  Ly = I_i
-			// top-down
 
-			vector<T> y( size );
-			vector<T> x( size );
-			int i;
-			for(i=0; i < size; i++)
-			{
-				T accum = static_cast<T>(0);
-				// first accumulate numerator
-				for(int a=0; a < i; a++)
-				{
-					accum += L[i][a] * y[a];
-				}
-				y[i] = ( I[i][c] - accum ) / L[i][i];
-			}
-			// then solve for x:  Ux = y
-			// bottom-up
-			for(i = size-1; i > -1; i--)
-			{
-				T accum = static_cast<T>(0);
-				// first accumulate numerator
-				for(int a=(size-1); a > i; a--)
-				{
-					accum += U[i][a] * x[a]; 
-				}
-				x[i] = ( y[i] - accum ) / U[i][i];
-			}		
+	//******* solve system of eqns ******
 		
-			// add col x to return var 
-			for(i = 0; i < size; i++)
+	Square<T> M_inv( size );
+	auto setM_inv = M_inv.getMatrix(); 
+		
+	const Eye<T> I( size );
+
+	// for each column of the inverse
+	for(int c=0; c < size; c++)
+	{
+		// solve for y:  Ly = I_i
+		// top-down
+
+		vector<T> y( size );
+		vector<T> x( size );
+		int i;
+		for(i=0; i < size; i++)
+		{
+			T accum = static_cast<T>(0);
+			// first accumulate numerator
+			for(int a=0; a < i; a++)
 			{
-				m_rv[i][c] = x[i];
+				accum += L[i][a] * y[a];
+			}
+			y[i] = ( I[i][c] - accum ) / L[i][i];
+		}
+		// then solve for x:  Ux = y
+		// bottom-up
+		for(i = size-1; i > -1; i--)
+		{
+			T accum = static_cast<T>(0);
+			// first accumulate numerator
+			for(int a=(size-1); a > i; a--)
+			{
+				accum += U[i][a] * x[a]; 
+			}
+			x[i] = ( y[i] - accum ) / U[i][i];
+		}		
+	
+		// add col x to return var 
+		for(i = 0; i < size; i++)
+		{
+			setM_inv[i][c] = x[i];
+		}
+
+		// apply permutations, if any
+		if ( int n = perm_queue.size() )
+		{
+			for(int i=n-1; i > -1; i++)
+			{
+				M_inv = M_inv * perm_queue[i];
 			}
 		}
 	}
-	else
-	{
-		cout << "matrix invert called on empty data!" << endl;
-		cout << "	returning zeros" << endl;
-	}
 
-	return m_rv;
+	return M_inv;
 }
 
 

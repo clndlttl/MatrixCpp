@@ -18,20 +18,20 @@ class Row : public Vec<T>
 
   public:
 	Row(){}
-	Row(int size ): Vec<T>( size ){}
+	Row<T>(int size ): Vec<T>( size ){}
     Row<T>(const vector<T>& v): Vec<T>( v ){}
 
 	// multiplication
-	Row<T> operator*(const T s);
-	template <class G> friend Row<G> operator*(const G s, Row<G> me);
-    T operator*(Column<T> c);
-	Row<T> operator*(Matrix2D<T> m);
+	Row<T> operator*(const T& s);
+	template <class G> friend Row<G> operator*(const G& s, Row<G> me);
+    T operator*(const Column<T>& c);
+	Row<T> operator*(const Matrix2D<T>& m);
 
 	// addition
-	Row<T> operator+(Row<T> r);	
+	Row<T> operator+(const Row<T>& r);	
 
 	// subtraction
-	Row<T> operator-(Row<T> r);	
+	Row<T> operator-(const Row<T>& r);	
 
 	// transpose
 	Column<T> t()
@@ -49,7 +49,7 @@ class Row : public Vec<T>
 
 // row by scalar
 template <class T>
-Row<T> Row<T>::operator*(const T s)
+Row<T> Row<T>::operator*(const T& s)
 {
 	int size = this->data.size();
 	Row<T> row_rv( size );
@@ -62,7 +62,7 @@ Row<T> Row<T>::operator*(const T s)
 }
 
 template <class G>
-Row<G> operator*(const G s, Row<G> me)
+Row<G> operator*(const G& s, Row<G> me)
 {
 	return me * s;
 }
@@ -70,7 +70,7 @@ Row<G> operator*(const G s, Row<G> me)
 
 // row by col
 template <class T>
-T Row<T>::operator*(Column<T> c)
+T Row<T>::operator*(const Column<T>& c)
 {
 	this->checkDimensions( c.getLength(), __FILE__, __LINE__ );
 
@@ -85,7 +85,7 @@ T Row<T>::operator*(Column<T> c)
 
 // row by mat
 template <class T>
-Row<T> Row<T>::operator*(Matrix2D<T> m)
+Row<T> Row<T>::operator*(const Matrix2D<T>& m)
 {
 	int mat_numRows = m.getNumRows();
 	int mat_numCols = m.getNumCols();
@@ -111,7 +111,7 @@ Row<T> Row<T>::operator*(Matrix2D<T> m)
 	 */
 
 template <class T>
-Row<T> Row<T>::operator+( Row<T> r )
+Row<T> Row<T>::operator+( const Row<T>& r )
 {
 	checkDimensions( r.getLength(), __FILE__, __LINE__ );
 	
@@ -131,7 +131,7 @@ Row<T> Row<T>::operator+( Row<T> r )
 	 */
 
 template <class T>
-Row<T> Row<T>::operator-( Row<T> r )
+Row<T> Row<T>::operator-( const Row<T>& r )
 {
 	checkDimensions( r.getLength(), __FILE__, __LINE__ );
 	

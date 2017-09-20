@@ -17,22 +17,22 @@ class Column : public Vec<T>
  
   public:
 	Column(){}
-	Column(int n): Vec<T>( n ){}
+	Column<T>(int n): Vec<T>( n ){}
     Column<T>(const vector<T>& v): Vec<T>( v ){}
 
 	// show
 	void show();
 	
 	// multiplication
-	Column<T> operator*(const T s);
-	template <class G> friend Column<G> operator*(const G s, Column<G> me);
-	Matrix2D<T> operator*( Row<T> r);
+	Column<T> operator*(const T& s);
+	template <class G> friend Column<G> operator*(const G& s, Column<G> me);
+	Matrix2D<T> operator*( const Row<T>& r);
 
 	// addition
-	Column<T> operator+(Column<T> c);
+	Column<T> operator+(const Column<T>& c);
 
 	// subtraction
-	Column<T> operator-(Column<T> c);	
+	Column<T> operator-(const Column<T>& c);	
 
 	// transpose
 	Row<T> t()
@@ -62,7 +62,7 @@ void Column<T>::show()
 
 // col by scalar
 template <class T>
-Column<T> Column<T>::operator*(const T s)
+Column<T> Column<T>::operator*(const T& s)
 {
 	int size = this->data.size();
 	Column<T> col_rv( size );
@@ -75,7 +75,7 @@ Column<T> Column<T>::operator*(const T s)
 }
 
 template <class G>
-Column<G> operator*(const G s, Column<G> me)
+Column<G> operator*(const G& s, Column<G> me)
 {
 	return me * s;
 }
@@ -84,7 +84,7 @@ Column<G> operator*(const G s, Column<G> me)
 
 // col by row
 template <class T>
-Matrix2D<T> Column<T>::operator*(Row<T> r)
+Matrix2D<T> Column<T>::operator*(const Row<T>& r)
 {
 	Matrix2D<T> M;
 	int n = r.getLength();
@@ -103,7 +103,7 @@ Matrix2D<T> Column<T>::operator*(Row<T> r)
 
 
 template <class T>
-Column<T> Column<T>::operator+( Column<T> c )
+Column<T> Column<T>::operator+( const Column<T>& c )
 {
 	checkDimensions( c.getLength(), __FILE__, __LINE__ );
 	
@@ -119,7 +119,7 @@ Column<T> Column<T>::operator+( Column<T> c )
 
 
 template <class T>
-Column<T> Column<T>::operator-( Column<T> c )
+Column<T> Column<T>::operator-( const Column<T>& c )
 {
 	checkDimensions( c.getLength(), __FILE__, __LINE__ );
 	

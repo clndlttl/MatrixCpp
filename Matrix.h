@@ -34,8 +34,8 @@ class Matrix2D
   public:
 	Matrix2D(){ numRows = numCols = 0; }
 	Matrix2D<T>( int rows, int cols );
-	Matrix2D<T>( int rows, int cols, vector<T>& v );
-	Matrix2D<T>( vector< vector<T>>& vv );
+	Matrix2D<T>( int rows, int cols, const vector<T>& v );
+	Matrix2D<T>( const vector< vector<T>>& vv );
 		
 	// show matrix
 	virtual void show();
@@ -53,42 +53,48 @@ class Matrix2D
 		}						
 	}
 
-	// get private data
-	int getNumRows(){ return numRows; }
-	int getNumCols(){ return numCols; }
+	// get protected data
+	int getNumRows() const { return numRows; }
+	int getNumCols() const { return numCols; }
 	
-	// return a reference to private matrix
-	vector< vector<T> >* getMatrix(){ return &matrix; }
+	// return a reference to protected matrix
+	vector< vector<T> >& getMatrix(){ return matrix; }
 
 	// multiplication
-	Column<T> operator*(Column<T> c);
-	Matrix2D<T> operator*(Matrix2D<T>& m_rhs);
-	Matrix2D<T> operator*(const T s);
-	template <class G> friend Matrix2D<G> operator*(const G s, Matrix2D<G>& me);
+	Column<T> operator*(const Column<T>& c);
+	Matrix2D<T> operator*(const Matrix2D<T>& m_rhs);
+	Matrix2D<T> operator*(const T& s);
+	template <class G> friend Matrix2D<G> operator*(const G& s, Matrix2D<G>& me);
 
 	// addition
-	Matrix2D<T> operator+(Matrix2D<T> m);
+	Matrix2D<T> operator+(const Matrix2D<T>& m);
 	
 	// subtraction
-	Matrix2D<T> operator-(Matrix2D<T> m);	
+	Matrix2D<T> operator-(const Matrix2D<T>& m);	
 
-	// at[]
-	vector<T>& operator[](int idx){ return matrix[idx]; }
+	// read-only at[]
+	vector<T> operator[](int idx) const { return matrix[idx]; }
 
 	// equality
-	bool operator==( Matrix2D<T>& m )
+	bool operator==( const Matrix2D<T>& m )
 	{
-		if ( matrix == *( m.getMatrix() ) )
-		{
-			return true;
-		}
-		else
+		if( numRows != m.getNumRows() )
 		{
 			return false;
-		}	
+		}
+
+		for(int i=0; i < numRows; i++)
+		{
+			if ( ! (matrix[i] == m[i] ) )
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 
-	bool operator==( vector< vector<T> >& v )
+	bool operator==( const vector< vector<T> >& v )
 	{
 		if ( matrix == v )
 		{
@@ -143,7 +149,7 @@ Matrix2D<T>::Matrix2D( int rows, int cols )
 
 
 template <class T>
-Matrix2D<T>::Matrix2D( int rows, int cols, vector<T>& v )
+Matrix2D<T>::Matrix2D( int rows, int cols, const vector<T>& v )
 {
 	if( v.size() < (rows*cols) )
 	{
@@ -164,7 +170,7 @@ Matrix2D<T>::Matrix2D( int rows, int cols, vector<T>& v )
 
 
 template <class T>
-Matrix2D<T>::Matrix2D( vector< vector<T> >& vv )
+Matrix2D<T>::Matrix2D( const vector< vector<T> >& vv )
 {
 	numRows = vv.size();
 	numCols = vv[0].size();
@@ -189,7 +195,7 @@ void Matrix2D<T>::show()
 
 // mat by col
 template <class T>
-Column<T> Matrix2D<T>::operator*(Column<T> c)
+Column<T> Matrix2D<T>::operator*(const Column<T>& c)
 {
 	int size = c.getLength();
 	checkDimensions( size, __FILE__, __LINE__ );
@@ -211,7 +217,7 @@ Column<T> Matrix2D<T>::operator*(Column<T> c)
 	
 // mat by mat
 template <class T>
-Matrix2D<T> Matrix2D<T>::operator*(Matrix2D<T>& m_rhs)
+Matrix2D<T> Matrix2D<T>::operator*(const Matrix2D<T>& m_rhs)
 {
 	int rhs_numRows = m_rhs.getNumRows();
 	int rhs_numCols = m_rhs.getNumCols();
@@ -240,7 +246,7 @@ Matrix2D<T> Matrix2D<T>::operator*(Matrix2D<T>& m_rhs)
 
 // mat by scalar
 template <class T>
-Matrix2D<T> Matrix2D<T>::operator*(const T s)
+Matrix2D<T> Matrix2D<T>::operator*(const T& s)
 {
 	Matrix2D<T> M;
 
@@ -258,7 +264,7 @@ Matrix2D<T> Matrix2D<T>::operator*(const T s)
 
 
 template <class G>
-Matrix2D<G> operator*(const G s, Matrix2D<G>& me)
+Matrix2D<G> operator*(const G& s, Matrix2D<G>& me)
 {
 	return me * s;
 }
@@ -267,7 +273,7 @@ Matrix2D<G> operator*(const G s, Matrix2D<G>& me)
 
 
 template <class T>
-Matrix2D<T> Matrix2D<T>::operator+( Matrix2D<T> m )
+Matrix2D<T> Matrix2D<T>::operator+( const Matrix2D<T>& m )
 {
 	checkDimensionsAddSub( m.getNumRows(), m.getNumCols(), __FILE__, __LINE__ );
 
@@ -287,7 +293,7 @@ Matrix2D<T> Matrix2D<T>::operator+( Matrix2D<T> m )
 
 
 template <class T>
-Matrix2D<T> Matrix2D<T>::operator-( Matrix2D<T> m )
+Matrix2D<T> Matrix2D<T>::operator-( const Matrix2D<T>& m )
 {
 	checkDimensionsAddSub( m.getNumRows(), m.getNumCols(), __FILE__, __LINE__ );
 
