@@ -128,7 +128,7 @@ class Matrix2D
 		return m_rv;
 	}
 
-	virtual bool isSquare(){ return numRows == numCols; }
+	bool isSquare(){ return numRows == numCols; }
 
 };
 
@@ -238,6 +238,9 @@ Matrix2D<T> Matrix2D<T>::operator*(const Matrix2D<T>& m_rhs)
 		}
 		matrix[i] = newRow;
 	}
+
+	numCols = rhs_numCols;
+
 	return *this;
 }
 	

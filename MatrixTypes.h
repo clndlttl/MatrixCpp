@@ -34,11 +34,10 @@ class Square : public Matrix2D<T>
 		}
 	}
 
-	bool isSquare(){ return true; }
 
 	T trace()
 	{
-		T accum = static_cast<T>( 0 );
+		T accum = static_cast<T>( 1 );
 		for(int i=0; i < this->numRows; i++)
 		{
 			accum *= this->matrix[i][i];
@@ -49,6 +48,9 @@ class Square : public Matrix2D<T>
 	Square<T> inv();
 
 	Square<T> operator^(int pow);
+
+	// Square matrix can't add rows
+	void addRow(vector<T>& row) = delete;
 
 };
 
