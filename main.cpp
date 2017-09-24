@@ -17,15 +17,8 @@ int main()
 	vector<T> col = { -4, 1, 3 };
 	Column<T> c( col );
 
-	Matrix2D<T> M( 3, 3, mat );
-	M.addRow( row );
-	M.addRow( col );
+	Square<T> M( 3, mat );
 
 	M.show();
-	M.t().show();
-	
-	Matrix2D<T> S = M.t() * M;
-
-	S.show();
 }
 

@@ -29,16 +29,13 @@ class Vec
 	// get row vec
 	vector<T>& getVec(){ return data; }
 
-	// add element
-	void add(T val){ data.push_back(val); }
-
 	// read-only at[]
 	T operator[](int idx) const { return data[idx]; }
 
 	// checkDimensions
 	void checkDimensions( int N, const char* file, int line );
 
-	// get length of row
+	// getLength
 	int getLength() const { return data.size(); }
 
 };

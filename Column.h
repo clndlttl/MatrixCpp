@@ -39,9 +39,10 @@ class Column : public Vec<T>
 	{
 		int size = this->data.size();
 		Row<T> row_rv( size );
+		vector<T>& p = row_rv.getVec();
 		for (int i=0; i < size; i++)
 		{
-			row_rv[i] = this->data[i];
+			p[i] = this->data[i];
 		}
 		return row_rv;
 	}	
@@ -104,7 +105,7 @@ Matrix2D<T> Column<T>::operator*(const Row<T>& r)
 template <class T>
 Column<T> Column<T>::operator+( const Column<T>& c )
 {
-	checkDimensions( c.getLength(), __FILE__, __LINE__ );
+	this->checkDimensions( c.getLength(), __FILE__, __LINE__ );
 	
 	int size = this->data.size();
 
@@ -119,7 +120,7 @@ Column<T> Column<T>::operator+( const Column<T>& c )
 template <class T>
 Column<T> Column<T>::operator-( const Column<T>& c )
 {
-	checkDimensions( c.getLength(), __FILE__, __LINE__ );
+	this->checkDimensions( c.getLength(), __FILE__, __LINE__ );
 	
 	int size = this->data.size();
 
