@@ -73,30 +73,16 @@ Square<T> Square<T>::operator^(int pow)
 	}
 	else if ( -1 == pow )
 	{
-//		if ( ! lu.isValid() )
-//		{
-//			cout << "LU decomp failed in M^-1" << endl;
-//		}
-//		else
-//		{
-			M_rv = inv();
-//		}
+		M_rv = inv();
 	}
 	else
 	{
-//		if ( ! lu.isValid() )
-//		{
-//			cout << "LU decomp failed in M^-1" << endl;
-//		}
-//		else
-//		{
-			M_rv = inv();
-			auto tmp = M_rv;
-			for(int i = -1; i > pow; i--)
-			{	
-				M_rv = M_rv * tmp;
-			}
-//		}
+		M_rv = inv();
+		auto tmp = M_rv;
+		for(int i = -1; i > pow; i--)
+		{	
+			M_rv = M_rv * tmp;
+		}
 	}
 
 	return M_rv;

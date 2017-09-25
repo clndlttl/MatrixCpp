@@ -53,6 +53,20 @@ class Matrix2D
 		}						
 	}
 
+	void addRow(Row<T>& row)
+	{
+		vector<T>& rowData = row.getVec(); 
+
+		checkDimensions( row.getLength(), __FILE__, __LINE__ );
+
+		matrix.push_back(rowData);
+		numRows++;
+		if( 1 == numRows )
+		{
+			numCols = rowData.size();	 
+		}						
+	}
+	
 	// get protected data
 	int getNumRows() const { return numRows; }
 	int getNumCols() const { return numCols; }
@@ -201,6 +215,7 @@ Column<T> Matrix2D<T>::operator*(const Column<T>& c)
 	checkDimensions( size, __FILE__, __LINE__ );
 
 	Column<T> col_rv( numRows );
+	vector<T>& newColData = col_rv.getVec(); 
 
 	for(int i=0; i < numRows; i++)
 	{
@@ -209,7 +224,7 @@ Column<T> Matrix2D<T>::operator*(const Column<T>& c)
 		{
 			accum += matrix[i][j] * c[j];
 		}
-		col_rv[i] = accum;
+		newColData[i] = accum;
 	}
 	return col_rv;
 }
