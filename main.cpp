@@ -7,21 +7,17 @@ int main()
 {
 	using T = double;
 
-	vector<T> y_val = { -3.6, -2.7, -1.2, 0.5, 1.7, 1.9, 3.7, 4.1, 6.0 };
-	Column<T> y_col( y_val );
+	vector<T> y_val = { 1.1, 1, 1, 0, 1, 1, 0, 0, 1 };
 
-	vector<T> x_val = { -3.2, -2.8, -1.5, 0.4, 1.3, 2.6, 3.2, 4.4, 5.8 };
+	Square<T> M( 3, y_val );
+	M.show();
 
-	Ones<T> offset( 9 );
+	Row<T> r( y_val );
+	Column<T> c( y_val );
+		
+	( 5 * M ).show();
+	( 4 * r ).show();
+	( 3 * c ).show();
 
-	Matrix2D<T> A;
-	A.addRow( x_val );
-	A.addRow( offset );
-	A = A.t();
-
-	Square<T> A2 = A.t() * A;
-
-	Column<T> m_and_b = ( A2.inv() * A.t() ) * y_col;
-	m_and_b.show();
 }
 

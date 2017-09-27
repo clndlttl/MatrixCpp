@@ -23,7 +23,7 @@ class Row : public Vec<T>
 
 	// multiplication
 	Row<T> operator*(const T& s);
-	template <class G> friend Row<G> operator*(const G& s, Row<G> me);
+	template <class G, class W> friend Row<T> operator*(const G& s, Row<T> me);
     T operator*(const Column<T>& c);
 	Row<T> operator*(const Matrix2D<T>& m);
 
@@ -61,8 +61,8 @@ Row<T> Row<T>::operator*(const T& s)
 	return *this;
 }
 
-template <class G>
-Row<G> operator*(const G& s, Row<G> me)
+template <class G, class W>
+Row<W> operator*(const G& s, Row<W> me)
 {
 	return me * s;
 }

@@ -25,7 +25,7 @@ class Column : public Vec<T>
 	
 	// multiplication
 	Column<T> operator*(const T& s);
-	template <class G> friend Column<G> operator*(const G& s, Column<G> me);
+	template <class G, class W> friend Column<T> operator*(const G& s, Column<T> me);
 	Matrix2D<T> operator*( const Row<T>& r);
 
 	// addition
@@ -74,8 +74,8 @@ Column<T> Column<T>::operator*(const T& s)
 	return *this;
 }
 
-template <class G>
-Column<G> operator*(const G& s, Column<G> me)
+template <class G, class W>
+Column<W> operator*(const G& s, Column<W> me)
 {
 	return me * s;
 }
