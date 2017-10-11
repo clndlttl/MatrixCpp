@@ -15,7 +15,6 @@
 #define ERROR false
 
 template <class T> class Eye;
-template <class T> class LU;
 template <class T> class Column;
 template <class T> class Row;
 
@@ -78,7 +77,8 @@ class Matrix2D
 	Column<T> operator*(const Column<T>& c);
 	Matrix2D<T> operator*(const Matrix2D<T>& m_rhs);
 	Matrix2D<T> operator*(const T& s);
-	template <class G, class W> friend Matrix2D<T> operator*(const G& s, Matrix2D<T> me);
+	template <class G> friend Matrix2D<G> operator*(const int& s, Matrix2D<G>& me);
+	template <class G> friend Matrix2D<G> operator*(const double& s, Matrix2D<G>& me);
 
 	// addition
 	Matrix2D<T> operator+(const Matrix2D<T>& m);
@@ -239,6 +239,9 @@ Matrix2D<T> Matrix2D<T>::operator*(const Matrix2D<T>& m_rhs)
 
 	checkDimensions( rhs_numRows, __FILE__, __LINE__ );
 
+	Matrix2D<T> M_rv = *this;
+	vector< vector<T> >& matRef = M_rv.getMatrix();
+
 	for(int i=0; i < numRows; i++)
 	{
 		vector<T> newRow( rhs_numCols );
@@ -251,12 +254,10 @@ Matrix2D<T> Matrix2D<T>::operator*(const Matrix2D<T>& m_rhs)
 			}
 			newRow[j] = accum;	 	
 		}
-		matrix[i] = newRow;
+		matRef[i] = newRow;
 	}
 
-	numCols = rhs_numCols;
-
-	return *this;
+	return M_rv;
 }
 	
 
@@ -264,21 +265,30 @@ Matrix2D<T> Matrix2D<T>::operator*(const Matrix2D<T>& m_rhs)
 template <class T>
 Matrix2D<T> Matrix2D<T>::operator*(const T& s)
 {
+	Matrix2D<T> M_rv = *this;
+	vector< vector<T> >& matRef = M_rv.getMatrix();
+
 	for(int i=0; i < numRows; i++)
 	{
 		for(int j=0; j < numCols; j++)
 		{
-			matrix[i][j] *= s;
+			matRef[i][j] *= s;
 		}
 	}
-	return *this;
+	return M_rv;
 }
 
 
-template <class G, class W>
-Matrix2D<W> operator*(const G& s, Matrix2D<W> me)
+template <class G>
+Matrix2D<G> operator*(const int& s, Matrix2D<G>& me)
 {
-	return me * s;
+	return me * static_cast<G>(s);
+}
+
+template <class G>
+Matrix2D<G> operator*(const double& s, Matrix2D<G>& me)
+{
+	return me * static_cast<G>(s);
 }
 
 
@@ -289,14 +299,17 @@ Matrix2D<T> Matrix2D<T>::operator+( const Matrix2D<T>& m )
 {
 	checkDimensionsAddSub( m.getNumRows(), m.getNumCols(), __FILE__, __LINE__ );
 
+	Matrix2D<T> M_rv = *this;
+	vector< vector<T> >& matRef = M_rv.getMatrix();
+
 	for(int i=0; i < numRows; i++)
 	{
  		for(int j=0; j < numCols; j++)
 		{
-			matrix[i][j] += m[i][j];
+			matRef[i][j] += m[i][j];
 		}
 	}
-	return *this;
+	return M_rv;
 }
 
 
@@ -305,14 +318,17 @@ Matrix2D<T> Matrix2D<T>::operator-( const Matrix2D<T>& m )
 {
 	checkDimensionsAddSub( m.getNumRows(), m.getNumCols(), __FILE__, __LINE__ );
 
+	Matrix2D<T> M_rv = *this;
+	vector< vector<T> >& matRef = M_rv.getMatrix();
+	
 	for(int i=0; i < numRows; i++)
 	{
  		for(int j=0; j < numCols; j++)
 		{
-			matrix[i][j] -= m[i][j];
+			matRef[i][j] -= m[i][j];
 		}
 	}
-	return *this;
+	return M_rv;
 }
 
 

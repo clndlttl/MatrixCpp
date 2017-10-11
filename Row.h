@@ -23,7 +23,8 @@ class Row : public Vec<T>
 
 	// multiplication
 	Row<T> operator*(const T& s);
-	template <class G, class W> friend Row<T> operator*(const G& s, Row<T> me);
+	template <class G> friend Row<G> operator*(const int& s, Row<G>& me);
+	template <class G> friend Row<G> operator*(const double& s, Row<G>& me);
     T operator*(const Column<T>& c);
 	Row<T> operator*(const Matrix2D<T>& m);
 
@@ -54,17 +55,26 @@ Row<T> Row<T>::operator*(const T& s)
 {
 	int size = this->data.size();
 
+	Row<T> R_rv = *this;
+	vector<T>& rowRef = R_rv.getVec();
+
 	for (int i=0; i < size; i++)
 	{
-		this->data[i] *= s;
+		rowRef[i] *= s;
 	}
-	return *this;
+	return R_rv;
 }
 
-template <class G, class W>
-Row<W> operator*(const G& s, Row<W> me)
+template <class G>
+Row<G> operator*(const int& s, Row<G>& me)
 {
-	return me * s;
+	return me * static_cast<G>(s);
+}
+
+template <class G>
+Row<G> operator*(const double& s, Row<G>& me)
+{
+	return me * static_cast<G>(s);
 }
 
 
@@ -92,7 +102,7 @@ Row<T> Row<T>::operator*(const Matrix2D<T>& m)
 
 	this->checkDimensions( mat_numRows, __FILE__, __LINE__ );
 
-	vector<T> newData( mat_numRows );
+	vector<T> newData( mat_numCols );
 
 	for(int i=0; i < mat_numCols; i++)
 	{
@@ -103,9 +113,10 @@ Row<T> Row<T>::operator*(const Matrix2D<T>& m)
 		}
 		newData[i] = accum;
 	}
-	this->data = newData;
+	
+	Row<T> R_rv( newData );
 
-	return *this;
+	return R_rv;
 }
 
 
@@ -120,11 +131,14 @@ Row<T> Row<T>::operator+( const Row<T>& r )
 	
 	int size = this->data.size();
 
+	Row<T> R_rv = *this;
+	vector<T>& rowRef = R_rv.getVec();
+
 	for(int i=0; i < size; i++)
 	{
-		this->data[i] += r[i];		
+		rowRef[i] += r[i];		
 	}
-	return *this;
+	return R_rv;
 }
 
 
@@ -139,11 +153,14 @@ Row<T> Row<T>::operator-( const Row<T>& r )
 	
 	int size = this->data.size();
 
+	Row<T> R_rv = *this;
+	vector<T>& rowRef = R_rv.getVec();
+
 	for(int i=0; i < size; i++)
 	{
-		this->data[i] -= r[i];		
+		rowRef[i] -= r[i];		
 	}
-	return *this;
+	return R_rv;
 }
 
 

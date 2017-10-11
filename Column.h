@@ -25,7 +25,8 @@ class Column : public Vec<T>
 	
 	// multiplication
 	Column<T> operator*(const T& s);
-	template <class G, class W> friend Column<T> operator*(const G& s, Column<T> me);
+	template <class G> friend Column<G> operator*(const int& s, Column<G>& me);
+	template <class G> friend Column<G> operator*(const double& s, Column<G>& me);
 	Matrix2D<T> operator*( const Row<T>& r);
 
 	// addition
@@ -67,17 +68,27 @@ Column<T> Column<T>::operator*(const T& s)
 {
 	int size = this->data.size();
 
+	Column<T> C_rv = *this;
+	vector<T>& colRef = C_rv.getVec();
+
 	for(int i=0; i < size; i++)
 	{
-		this->data[i] *= s;
+		colRef[i] *= s;
 	}
-	return *this;
+	return C_rv;
 }
 
-template <class G, class W>
-Column<W> operator*(const G& s, Column<W> me)
+
+template <class G>
+Column<G> operator*(const int& s, Column<G>& me)
 {
-	return me * s;
+	return me * static_cast<G>(s);
+}
+
+template <class G>
+Column<G> operator*(const double& s, Column<G>& me)
+{
+	return me * static_cast<G>(s);
 }
 
 
@@ -109,11 +120,14 @@ Column<T> Column<T>::operator+( const Column<T>& c )
 	
 	int size = this->data.size();
 
+	Column<T> C_rv = *this;
+	vector<T>& colRef = C_rv.getVec();
+
 	for(int i=0; i < size; i++)
 	{
-		this->data[i] += c[i];		
+		colRef[i] += c[i];		
 	}
-	return *this;
+	return C_rv;
 }
 
 
@@ -124,11 +138,14 @@ Column<T> Column<T>::operator-( const Column<T>& c )
 	
 	int size = this->data.size();
 
+	Column<T> C_rv = *this;
+	vector<T>& colRef = C_rv.getVec();
+	
 	for(int i=0; i < size; i++)
 	{
-		this->data[i] -= c[i];		
+		colRef[i] -= c[i];		
 	}
-	return *this;
+	return C_rv;
 }
 
 
