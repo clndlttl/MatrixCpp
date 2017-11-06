@@ -51,16 +51,23 @@ public:
 	{
 		K = P*H.t()*( H*P*H.t() + R )^(-1);
 		x_new = x_est + K*( z - H*x_est );
+
+		x_new.show();
+
 		P = ( I - K*H ) * P;
 		x_est = A * x_new;
 		P = A * P * A.t() + Q;
+		
 	}
 
 	// single meas
-	void advance( T& z )
+	void advance( T z )
 	{
 		k = P*h.t()*( 1.0 / (h*P*h.t() + r ));
 		x_new = x_est + k*( z - h*x_est );
+
+		x_new.show();
+
 		P = ( I - k*h ) * P;
 		x_est = A * x_new;
 		P = A * P * A.t() + Q;
