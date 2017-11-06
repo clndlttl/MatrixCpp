@@ -37,10 +37,10 @@ class Square : public Matrix2D<T>
 
 	T trace()
 	{
-		T accum = static_cast<T>( 1 );
+		T accum = static_cast<T>( 0 );
 		for(int i=0; i < this->numRows; i++)
 		{
-			accum *= this->matrix[i][i];
+			accum += this->matrix[i][i];
 		}
 		return accum;
 	}
@@ -109,6 +109,7 @@ template <class T>
 class Eye : public Square<T>
 {
   public:
+	Eye<T>(){}
 	Eye<T>( int size ) : Square<T>( size ) 
 	{
 		for(int i=0; i < size; i++)
